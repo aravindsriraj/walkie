@@ -1,0 +1,76 @@
+:root {
+  --bg: #f7f7f8;
+  --surface: #ffffff;
+  --text: #1f2937;
+  --muted: #6b7280;
+  --border: #e5e7eb;
+  --brand: #6d28d9;
+  --brand-soft: #ede9fe;
+  --danger: #dc2626;
+  font: 16px/1.55 Inter, system-ui, -apple-system, sans-serif;
+  color: var(--text);
+  background: var(--bg);
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #111114;
+    --surface: #1a1a1f;
+    --text: #e5e7eb;
+    --muted: #9ca3af;
+    --border: #2e2e36;
+    --brand: #a78bfa;
+    --brand-soft: #2a2140;
+  }
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); }
+a { color: inherit; }
+main { max-width: 820px; margin: 0 auto; padding: 24px 16px 96px; }
+.top { display: flex; align-items: center; gap: 16px; padding: 14px 24px; border-bottom: 1px solid var(--border); background: var(--surface); }
+.logo { font-weight: 700; color: var(--brand); text-decoration: none; letter-spacing: -0.01em; }
+.muted { color: var(--muted); }
+.error { color: var(--danger); }
+.empty { text-align: center; padding: 72px 16px; }
+.empty h2 { margin: 12px 0 8px; }
+
+.list { list-style: none; padding: 0; margin: 0; display: grid; gap: 8px; }
+.list a { display: grid; grid-template-columns: 1fr auto; gap: 2px 12px; padding: 14px 16px; background: var(--surface);
+  border: 1px solid var(--border); border-radius: 10px; text-decoration: none; }
+.list a:hover { border-color: var(--brand); }
+.list-title { font-weight: 600; }
+.list .muted { font-size: 13px; }
+.badge { grid-row: span 2; align-self: center; font-size: 12px; padding: 2px 8px; border-radius: 99px; background: var(--brand-soft); color: var(--brand); }
+.badge.failed { background: #fee2e2; color: var(--danger); }
+
+.toolbar { position: sticky; top: 0; z-index: 2; display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 10px 0;
+  margin-bottom: 16px; background: var(--bg); border-bottom: 1px solid var(--border); }
+.spacer { flex: 1; }
+.msg { font-size: 13px; }
+button, .btn { font: inherit; font-size: 14px; padding: 6px 12px; border-radius: 8px; border: 1px solid var(--border);
+  background: var(--surface); color: var(--text); cursor: pointer; text-decoration: none; }
+button:disabled { opacity: 0.45; cursor: default; }
+button.primary { background: var(--brand); border-color: var(--brand); color: #fff; font-weight: 600; }
+button:focus-visible, .btn:focus-visible, textarea:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
+
+textarea { width: 100%; resize: none; overflow: hidden; border: 1px solid transparent; border-radius: 8px; padding: 6px 8px;
+  margin: 0 0 8px -8px; background: transparent; color: var(--text); font: inherit; }
+textarea:hover { border-color: var(--border); }
+textarea:focus { border-color: var(--brand); background: var(--surface); outline: none; }
+.title { font-size: 2rem; font-weight: 700; line-height: 1.2; letter-spacing: -0.02em; }
+
+.steps { list-style: none; padding: 0; margin: 24px 0; display: grid; gap: 20px; }
+.step { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 16px; }
+.step-head { display: grid; grid-template-columns: auto 1fr; gap: 4px 12px; align-items: start; }
+.num { width: 28px; height: 28px; margin-top: 4px; border-radius: 50%; display: grid; place-items: center;
+  background: var(--brand-soft); color: var(--brand); font-weight: 700; font-size: 14px; }
+.step-text { margin-bottom: 0; }
+.step-actions { grid-column: 2; display: flex; flex-wrap: wrap; gap: 6px; }
+.step-actions button { font-size: 12px; padding: 3px 8px; }
+.media { display: grid; gap: 8px; margin-top: 12px; }
+.media img, .media video { width: 100%; border: 1px solid var(--border); border-radius: 8px; display: block; }
+.toggle { display: inline-flex; gap: 6px; align-items: center; margin-top: 8px; font-size: 13px; color: var(--muted); }
+
+.spinner { width: 32px; height: 32px; margin: 0 auto; border-radius: 50%; border: 3px solid var(--brand-soft);
+  border-top-color: var(--brand); animation: spin 0.9s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .spinner { animation-duration: 3s; } }

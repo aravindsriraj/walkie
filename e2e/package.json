@@ -1,0 +1,7 @@
+{
+  "name": "stepcast-e2e",
+  "private": true,
+  "type": "module",
+  "scripts": { "test": "node extension.test.mjs" },
+  "devDependencies": { "playwright": "1.63.0" }
+}

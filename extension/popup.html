@@ -1,0 +1,24 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  body { font: 14px system-ui, sans-serif; width: 240px; margin: 0; padding: 14px; color: #1f2937; }
+  h1 { font-size: 15px; margin: 0 0 10px; }
+  button { width: 100%; padding: 9px; border: 0; border-radius: 8px; font: inherit; font-weight: 600; color: #fff; background: #6D28D9; cursor: pointer; }
+  button.stop { background: #dc2626; }
+  label { display: flex; gap: 6px; align-items: center; margin: 10px 0; }
+  #status { color: #6b7280; min-height: 1.2em; }
+  #status.error { color: #dc2626; }
+  a { color: #6D28D9; font-size: 12px; }
+</style>
+</head>
+<body>
+  <h1>Stepcast</h1>
+  <button id="toggle">Start recording</button>
+  <label><input type="checkbox" id="mic"> Narrate with microphone</label>
+  <p id="status"></p>
+  <a href="permission.html" target="_blank">Enable microphone</a>
+  <script src="popup.js"></script>
+</body>
+</html>
