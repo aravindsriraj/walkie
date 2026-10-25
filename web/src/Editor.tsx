@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { API, type Article, fileUrl, getArticle, imageUrl, renderClips, saveArticle, type Step } from "./api";
+import { API, type Article, getArticle, imageUrl, saveArticle, type Step } from "./api";
 import { mergeNext, move, remove } from "./stepOps";
 
 function AutoText({ value, onChange, className, placeholder }: {
@@ -20,29 +20,23 @@ export function Editor({ id }: { id: string }) {
   const [msg, setMsg] = useState("");
   const [error, setError] = useState("");
 
-  // Poll while the server is still writing the article or rendering clips.
-  // Once the article is ready, only clip fields are merged in so local edits survive.
-  const polling = !a || a.status === "processing" || a.clips_status === "rendering";
+  // Poll while the server is still writing the article (nothing is editable until then).
   useEffect(() => {
-    if (!polling) return;
     let stop = false;
     let timer = 0;
     const load = async () => {
       try {
         const next = await getArticle(id);
         if (stop) return;
-        setA((cur) => (!cur || cur.status !== "ready" ? next : {
-          ...cur, clips_status: next.clips_status,
-          steps: cur.steps.map((s) => ({ ...s, clip: next.steps.find((n) => n.id === s.id)?.clip ?? s.clip })),
-        }));
-        if (next.status === "processing" || next.clips_status === "rendering") timer = window.setTimeout(load, 2000);
+        setA(next);
+        if (next.status === "processing") timer = window.setTimeout(load, 2000);
       } catch (e) {
         setError((e as Error).message);
       }
     };
     load();
     return () => { stop = true; clearTimeout(timer); };
-  }, [id, polling]);
+  }, [id]);
 
   useEffect(() => {
     const warn = (e: BeforeUnloadEvent) => { if (dirty) e.preventDefault(); };
@@ -70,11 +64,6 @@ export function Editor({ id }: { id: string }) {
       setMsg(`Save failed: ${(e as Error).message}`);
     }
   };
-  const clips = async () => {
-    if (dirty) await save();
-    await renderClips(a.id);
-    setA({ ...a, clips_status: "rendering" });
-  };
 
   const share = `${API}/a/${a.id}`;
   return (
@@ -87,11 +76,7 @@ export function Editor({ id }: { id: string }) {
         <a className="btn" href={`${share}?print=1`} target="_blank">PDF</a>
         <a className="btn" href={`${API}/articles/${a.id}/export.md.zip`}>Markdown</a>
         <a className="btn" href={`${API}/articles/${a.id}/export.html`}>HTML</a>
-        <button className="btn" onClick={clips} disabled={a.clips_status === "rendering"}>
-          {a.clips_status === "rendering" ? "Rendering clips…" : a.clips_status === "ready" ? "Re-render clips" : "Render clips"}
-        </button>
       </div>
-      {a.clips_status === "failed" && <p className="error">Clip rendering failed. Check the server log and try again.</p>}
 
       <AutoText className="title" value={a.title} onChange={(title) => edit({ title })} placeholder="Article title" />
       <AutoText className="prose" value={a.intro} onChange={(intro) => edit({ intro })} placeholder="Intro" />
@@ -111,7 +96,6 @@ export function Editor({ id }: { id: string }) {
             </div>
             <div className="media">
               <img src={imageUrl(a.id, s)} alt={`Step ${i + 1}`} />
-              {s.clip && <video src={fileUrl(a.id, s.clip)} controls muted loop playsInline />}
             </div>
             <label className="toggle">
               <input type="checkbox" checked={s.zoomed} onChange={(e) => setStep(i, { zoomed: e.target.checked })} /> Zoom into the element

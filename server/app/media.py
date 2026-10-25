@@ -42,13 +42,6 @@ def content_box(fw: int, fh: int, vp: Viewport) -> tuple[int, int, int, int]:
     return (fw - w) // 2, (fh - h) // 2, w, h
 
 
-def page_to_frame(r: Rect, fw: int, fh: int, vp: Viewport) -> Rect:
-    """Page CSS-px rect → pixel rect in the full capture frame."""
-    x, y, w, _ = content_box(fw, fh, vp)
-    s = w / vp.w
-    return Rect(x=x + r.x * s, y=y + r.y * s, w=r.w * s, h=r.h * s)
-
-
 def frame_time(ev: RecEvent, duration_ms: int) -> int:
     # Clicks: just before the UI reacts. Inputs: just after, so the typed value shows.
     t = ev.t + 100 if ev.kind == "input" else ev.t - 150

@@ -6,7 +6,6 @@ export type Step = {
   text: string;
   frame: number;
   zoomed: boolean;
-  clip: string | null;
 };
 
 export type Article = {
@@ -17,7 +16,6 @@ export type Article = {
   intro: string;
   outro: string;
   steps: Step[];
-  clips_status: "none" | "rendering" | "ready" | "failed";
   created_at: string;
 };
 
@@ -29,7 +27,6 @@ async function call<T>(path: string, init?: RequestInit): Promise<T> {
 
 export const listArticles = () => call<Article[]>("/articles");
 export const getArticle = (id: string) => call<Article>(`/articles/${id}`);
-export const renderClips = (id: string) => call<unknown>(`/articles/${id}/clips`, { method: "POST" });
 export const saveArticle = (a: Article) =>
   call<Article>(`/articles/${a.id}`, {
     method: "PUT",
@@ -38,4 +35,3 @@ export const saveArticle = (a: Article) =>
   });
 
 export const imageUrl = (id: string, s: Step) => `${API}/files/${id}/frames/${s.frame}_${s.zoomed ? "zoom" : "full"}.png`;
-export const fileUrl = (id: string, path: string) => `${API}/files/${id}/${path}`;

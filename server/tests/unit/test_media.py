@@ -2,7 +2,7 @@ import subprocess
 
 from PIL import Image, ImageStat
 
-from app.media import content_box, crop_box, frame_time, page_to_frame, render_frames
+from app.media import content_box, crop_box, frame_time, render_frames
 from app.models import RecEvent, Rect, Viewport
 
 VP = Viewport(w=640, h=400)
@@ -55,12 +55,10 @@ def test_render_frames_writes_and_blurs(tmp_path):
     assert var_blur < var_orig * 0.5
 
 
-def test_content_box_and_page_to_frame_letterbox():
+def test_content_box_letterbox():
     vp = Viewport(w=1280, h=800)  # 16:10 page inside a 16:9 capture → bars left/right
     assert content_box(3840, 2160, vp) == (192, 0, 3456, 2160)
     assert content_box(2560, 1600, vp) == (0, 0, 2560, 1600)  # same shape: no bars
-    r = page_to_frame(Rect(x=100, y=100, w=10, h=10), 3840, 2160, vp)
-    assert (round(r.x), round(r.y), round(r.w)) == (462, 270, 27)
 
 
 def test_render_frames_crops_letterbox_and_aligns_highlight(tmp_path):

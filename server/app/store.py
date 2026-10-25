@@ -41,5 +41,3 @@ def mark_interrupted() -> None:
     for a in list_all():
         if a.status == "processing":
             save(a.model_copy(update={"status": "failed", "error": "Interrupted — please re-upload"}))
-        elif a.clips_status == "rendering":
-            save(a.model_copy(update={"clips_status": "failed"}))

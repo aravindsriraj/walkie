@@ -37,7 +37,6 @@ class Step(BaseModel):
     text: str
     frame: int  # event index whose screenshot is shown
     zoomed: bool = True
-    clip: str | None = None
 
 
 class Article(BaseModel):
@@ -48,7 +47,6 @@ class Article(BaseModel):
     intro: str = ""
     outro: str = ""
     steps: list[Step] = []
-    clips_status: Literal["none", "rendering", "ready", "failed"] = "none"
     created_at: str
 
 

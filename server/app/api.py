@@ -12,7 +12,7 @@ from fastapi.responses import HTMLResponse, Response
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
-from app import clips, store
+from app import store
 from app.export import image_name, markdown_zip, render_html
 from app.models import Article, RecEvent, Step
 from app.pipeline import process
@@ -88,17 +88,6 @@ def update_article(article_id: str, edit: ArticleEdit) -> Article:
     return a
 
 
-@app.post("/articles/{article_id}/clips", status_code=202)
-def render_clips(article_id: str, background: BackgroundTasks) -> dict:
-    a = _article(article_id)
-    if a.status != "ready":
-        raise HTTPException(409, "Article is not ready")
-    if a.clips_status != "rendering":
-        store.save(a.model_copy(update={"clips_status": "rendering"}))
-        background.add_task(clips.render_clips, article_id)
-    return {"clips_status": "rendering"}
-
-
 @app.get("/articles/{article_id}/export.md.zip")
 def export_md(article_id: str) -> Response:
     a = _article(article_id)
@@ -123,5 +112,4 @@ def share(article_id: str, print: bool = False) -> str:
     a = _article(article_id)
     if a.status != "ready":
         raise HTTPException(404, "Article not found")
-    return render_html(a, lambda s: f"/files/{a.id}/{image_name(s)}",
-                       lambda s: f"/files/{a.id}/{s.clip}", autoprint=print)
+    return render_html(a, lambda s: f"/files/{a.id}/{image_name(s)}", autoprint=print)

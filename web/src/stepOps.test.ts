@@ -2,7 +2,7 @@ import { expect, test } from "vitest";
 import type { Step } from "./api";
 import { mergeNext, move, remove } from "./stepOps";
 
-const s = (id: string, frame: number): Step => ({ id, event_ids: [frame], text: id, frame, zoomed: true, clip: null });
+const s = (id: string, frame: number): Step => ({ id, event_ids: [frame], text: id, frame, zoomed: true });
 const steps = [s("a", 0), s("b", 1), s("c", 2)];
 const ids = (xs: Step[]) => xs.map((x) => x.id);
 
