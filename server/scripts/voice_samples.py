@@ -11,7 +11,6 @@ import asyncio
 import base64
 import io
 import re
-import subprocess
 import sys
 import time
 import unicodedata
@@ -48,11 +47,6 @@ LINES = {
 def wav_ms(data: bytes) -> int:
     with wave.open(io.BytesIO(data)) as w:
         return round(w.getnframes() * 1000 / w.getframerate())
-
-
-def to_wav(path: str) -> bytes:
-    return subprocess.run(["ffmpeg", "-loglevel", "error", "-i", path, "-ac", "1", "-ar", "24000", "-sample_fmt", "s16",
-                           "-f", "wav", "-"], check=True, capture_output=True).stdout
 
 
 async def speak(c, text: str, voice: str) -> bytes:
@@ -102,12 +96,13 @@ async def main(out: Path, mine: tuple[str, str] | None) -> None:
     async with genai.Client().aio as c:
         voices = list(VOICES)
         if mine:
-            b64 = lambda p: base64.b64encode(to_wav(p)).decode()  # noqa: E731
-            v = await c.voices.create(store=False, voice={
-                "model": TTS, "type": "replicated", "display_name": "Stepcast",
-                "replicated": {"source_audio": {"mime_type": "audio/wav", "data": b64(mine[0])},
-                               "consent_audio": {"mime_type": "audio/wav", "data": b64(mine[1])}}})
-            voices = [v.key]
+            from app import gemini, media
+            wavs = []
+            (out / "in").mkdir(exist_ok=True)
+            for i, src in enumerate(mine):  # a file, not a pipe: a piped WAV has no length and Gemini rejects it
+                media.to_wav(Path(src), out / "in" / f"{i}.wav")
+                wavs.append((out / "in" / f"{i}.wav").read_bytes())
+            voices = [await gemini.make_voice_key(*wavs)]
         sem = asyncio.Semaphore(6)
 
         async def one(voice, lang, n, text):

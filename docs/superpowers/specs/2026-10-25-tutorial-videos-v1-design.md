@@ -277,15 +277,17 @@ The existing article editor gains a **Video** view next to the **Article** view:
 
 ## Decided during build
 
-- **Voices (provisional, for the founder to confirm by ear):** Achird (friendly, the default), Sulafat (warm), Kore
+- **Voices (confirmed by the founder, 2026-10-26):** Achird (friendly, the default), Sulafat (warm), Kore
   (firm), Aoede (breezy), Charon (informative). All eight candidates rendered cleanly in English, Spanish and German,
   at about 4 s per clip and a natural ~15 characters per second. An automated Gemini judge rated every voice the same,
   3/10, so it didn't help choose. Its one consistent note: slight pauses around English UI names inside Spanish and
   German sentences. Samples: `server/scripts/voice_samples.py`.
 - **Cursor:** tab capture does not show the cursor (checked on the end-to-end recording). The click outline is
   drawn in every video, so nothing depends on it.
-- **Own voice across languages:** untested until the founder records a sample and the consent statement. Translated
-  videos fall back to the default voice if their voice fails.
+- **Own voice across languages:** checked with the founder's laptop-mic recording. English and Spanish videos sound
+  right by ear; transcribed back, it scores en 0%, de 6%, fr 11%, ja 3%. Spanish scored 27% only because the
+  transcriber dropped words after a pause in one clip (each half transcribed correctly). Translated videos still fall
+  back to the default voice if their voice fails.
 - **Sync by construction:** scenes are rendered video-only and the voiceover is one WAV with each clip at its exact
   sample offset (per-scene AAC segments drift ~20 ms at every join). Freezes use ffmpeg `loop` (`tpad` on a single
   frame holds nothing on ffmpeg 7.1).
