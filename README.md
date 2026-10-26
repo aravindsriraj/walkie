@@ -12,10 +12,10 @@ in 20 languages, ready for your docs site.**
 [Website](https://aravindsriraj.github.io/walkie/) · [Quick start](#quick-start) · [How it works](#how-it-works) · [Tour](#tour) ·
 [Docs sites](#publish-to-your-docs-site) · [FAQ](#faq) · [Developing](#developing)
 
-<img src="docs/media/demo.gif" alt="A tutorial video made by Walkie: zoom on each click, outlined fields, a blurred email address and captions" width="800">
+<a href="https://aravindsriraj.github.io/walkie/landing/tour.mp4"><img src="docs/media/tour.jpg" alt="Watch the 80-second tour of Walkie" width="800"></a>
 
-<sub>Made by Walkie from one recording. The voiceover (captions here, since GIFs are silent), zoom, outlines and
-the blurred email address are all automatic.</sub>
+<sub>▶ <a href="https://aravindsriraj.github.io/walkie/landing/tour.mp4">Watch the 80-second tour</a>, with sound: one rough
+recording of a demo CRM, narrated and translated by Walkie, then every feature.</sub>
 
 </div>
 
@@ -90,6 +90,9 @@ flowchart LR
     article --> langs
     langs --> zip["Export for docs<br/>Markdown · images · MP4 · VTT"]
 ```
+
+<p align="center"><img src="docs/media/demo.gif" alt="A tutorial video made by Walkie: zoom on each click, outlined fields, a blurred email address and captions" width="720"><br>
+<sub>A Walkie video: zoom and an outline on each click, the email blurred, captions (GIFs are silent).</sub></p>
 
 **In sync by design.** Instead of laying a voice over the recording, Walkie fits each scene's footage to its
 sentence. A click always lands just after its sentence starts (0.4 s), slow
