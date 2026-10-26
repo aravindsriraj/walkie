@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
-import { forgetMyVoice, getGlossary, getMyVoice, saveGlossary, setUpMyVoice } from "./api";
+import { forgetMyVoice, getGlossary, getMyVoice, getPronunciations, saveGlossary, savePronunciations, setUpMyVoice } from "./api";
+import { formatPronunciations, parsePronunciations } from "./pronounce";
 
 const SAMPLE_TEXT =
   "Hi, I'm recording a short sample of my voice. In a moment I'll walk you through a feature step by step: " +
@@ -148,13 +149,49 @@ function VoiceSection() {
   );
 }
 
+function PronunciationSection() {
+  const [text, setText] = useState("");
+  const [saved, setSaved] = useState("");
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    // Keep anything typed while the saved list was loading.
+    getPronunciations().then((p) => { const t = formatPronunciations(p.words); setText((cur) => cur || t); setSaved(t); }).catch(() => {});
+  }, []);
+
+  const save = async () => {
+    if (text === saved) return;
+    try {
+      const t = formatPronunciations((await savePronunciations(parsePronunciations(text))).words);
+      setText(t);
+      setSaved(t);
+      setError("");
+    } catch (e) {
+      setError((e as Error).message);
+    }
+  };
+
+  return (
+    <section className="settings-section" aria-labelledby="say-h">
+      <h3 id="say-h">Pronunciations</h3>
+      <p className="settings-hint">
+        How the voice should say product names and jargon, one per line: <strong>word = how to say it</strong>. Captions
+        and articles keep the real spelling. Videos use it the next time they're updated.
+      </p>
+      <textarea className="keep-list" rows={4} value={text} onChange={(e) => setText(e.target.value)} onBlur={save}
+        aria-labelledby="say-h" placeholder={"SQL = sequel\nnginx = engine x"} />
+      <p className="settings-hint" aria-live="polite">{error ? <span className="error-text">{error}</span> : text === saved && saved ? "Saved" : ""}</p>
+    </section>
+  );
+}
+
 function GlossarySection() {
   const [text, setText] = useState("");
   const [saved, setSaved] = useState("");
   const [error, setError] = useState("");
 
   useEffect(() => {
-    getGlossary().then((g) => { setText(g.words.join("\n")); setSaved(g.words.join("\n")); }).catch(() => {});
+    getGlossary().then((g) => { setText((cur) => cur || g.words.join("\n")); setSaved(g.words.join("\n")); }).catch(() => {});
   }, []);
 
   const save = async () => {
@@ -195,6 +232,7 @@ export function SettingsDialog({ open, onClose }: { open: boolean; onClose: () =
       {open && (
         <>
           <VoiceSection />
+          <PronunciationSection />
           <GlossarySection />
         </>
       )}

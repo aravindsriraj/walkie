@@ -201,6 +201,13 @@ def test_translation_endpoints(client, monkeypatch):
     assert "es" not in store.get(article_id).translations
 
 
+def test_pronunciations_round_trip(client):
+    assert client.get("/settings/pronunciations").json() == {"words": {}}
+    r = client.put("/settings/pronunciations", json={"words": {" SQL ": " sequel ", "": "x", "nginx": " "}})
+    assert r.status_code == 200 and r.json() == {"words": {"SQL": "sequel"}}
+    assert client.get("/settings/pronunciations").json() == {"words": {"SQL": "sequel"}}
+
+
 def test_glossary_round_trip(client):
     assert client.get("/settings/glossary").json() == {"words": []}
     r = client.put("/settings/glossary", json={"words": [" Acmeflow ", "", "Acmeflow", "Save"]})

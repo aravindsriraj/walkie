@@ -3,6 +3,7 @@
 import asyncio
 import hashlib
 import logging
+import re
 import shutil
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
@@ -43,9 +44,18 @@ async def resolve(voice: str) -> str:
     return s.my_voice_key
 
 
+def spoken(words: str, say: dict[str, str]) -> str:
+    """The words as the voice should say them: each listed word (whole word, any case) swapped for how to say it."""
+    if not say:
+        return words
+    lookup = {w.lower(): s for w, s in say.items()}
+    pattern = "|".join(re.escape(w) for w in sorted(say, key=len, reverse=True))  # "Acme CRM" before "CRM"
+    return re.sub(rf"(?<!\w)(?:{pattern})(?!\w)", lambda m: lookup[m[0].lower()], words, flags=re.IGNORECASE)
+
+
 async def clip(d: Path, text: str, voice: str) -> Path:
-    """The narration clip for `text`, cached by voice and words, so unchanged scenes are never re-spoken."""
-    words = speakable(text)
+    """The narration clip for `text`, cached by voice and spoken words, so unchanged scenes are never re-spoken."""
+    words = spoken(speakable(text), settings.load().pronunciations)
     if not words:
         raise ValueError("Nothing to say")
     voice = voice or DEFAULT_VOICE

@@ -76,3 +76,26 @@ def test_settings_round_trip(data):
     assert settings.load().glossary == []
     settings.save(settings.Settings(glossary=["Acmeflow"]))
     assert settings.load().glossary == ["Acmeflow"]
+
+
+def test_spoken_swaps_whole_words_only_ignoring_case():
+    say = {"SQL": "sequel", "nginx": "engine x", "Acme CRM": "Acme C R M"}
+    assert voice.spoken("Open nginx, then the SQL tab.", say) == "Open engine x, then the sequel tab."
+    assert voice.spoken("NGINX and sql", say) == "engine x and sequel"
+    assert voice.spoken("SQLite stays", say) == "SQLite stays"  # not inside other words
+    assert voice.spoken("Open Acme CRM now", say) == "Open Acme C R M now"  # longer entries first
+    assert voice.spoken("Nothing here", {}) == "Nothing here"
+
+
+def test_clip_speaks_pronunciations_and_recaches_when_they_change(tmp_path, monkeypatch):
+    calls = []
+
+    async def fake_speak(text, v, style):
+        calls.append(text)
+        return wav_bytes(500)
+
+    monkeypatch.setattr(voice.gemini, "speak", fake_speak)
+    a = asyncio.run(voice.clip(tmp_path, "Run the SQL query.", ""))
+    settings.save(settings.load().model_copy(update={"pronunciations": {"SQL": "sequel"}}))
+    b = asyncio.run(voice.clip(tmp_path, "Run the SQL query.", ""))
+    assert a != b and calls == ["Run the SQL query.", "Run the sequel query."]

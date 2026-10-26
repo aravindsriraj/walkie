@@ -113,6 +113,11 @@ export const saveGlossary = (words: string[]) =>
   call<{ words: string[] }>("/settings/glossary", {
     method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ words }),
   });
+export const getPronunciations = () => call<{ words: Record<string, string> }>("/settings/pronunciations");
+export const savePronunciations = (words: Record<string, string>) =>
+  call<{ words: Record<string, string> }>("/settings/pronunciations", {
+    method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ words }),
+  });
 
 export async function deleteArticle(id: string): Promise<void> {
   const res = await fetch(`${API}/articles/${id}`, { method: "DELETE" });

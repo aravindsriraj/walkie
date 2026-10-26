@@ -251,6 +251,22 @@ def put_glossary(body: Glossary) -> Glossary:
     return Glossary(words=words)
 
 
+class Pronunciations(BaseModel):
+    words: dict[str, str]  # word → how to say it
+
+
+@app.get("/settings/pronunciations")
+def get_pronunciations() -> Pronunciations:
+    return Pronunciations(words=settings.load().pronunciations)
+
+
+@app.put("/settings/pronunciations")
+def put_pronunciations(body: Pronunciations) -> Pronunciations:
+    words = {w.strip(): s.strip() for w, s in body.words.items() if w.strip() and s.strip()}
+    settings.save(settings.load().model_copy(update={"pronunciations": words}))
+    return Pronunciations(words=words)
+
+
 def _slug(title: str) -> str:
     return re.sub(r"[^a-z0-9]+", "-", title.lower()).strip("-")[:60] or "video"
 

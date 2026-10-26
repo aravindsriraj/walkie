@@ -7,6 +7,7 @@ from app import store
 
 class Settings(BaseModel):
     glossary: list[str] = []  # never translated: product names, UI labels
+    pronunciations: dict[str, str] = {}  # word → how the voice says it; captions and articles keep the word
     my_voice_key: str = ""  # stateless Gemini voice key for the user's own voice
     my_voice_created: str = ""  # ISO time the key was made; keys expire after 7 days
 
