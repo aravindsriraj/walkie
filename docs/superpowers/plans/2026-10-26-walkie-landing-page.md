@@ -12,7 +12,7 @@
 
 ## Global Constraints
 
-- Product name: **Walkie**. GitHub: `https://github.com/aravindsriraj/walkie` (one constant, `GITHUB_URL` in `web/src/landing.ts`).
+- Product name: **Walkie**. GitHub: `https://github.com/aravindsriraj/walkie` (one constant, `GITHUB_URL` in `web/src/firstVisit.ts`).
 - Settings: `STEPCAST_*` → `WALKIE_*` (`WALKIE_DATA`, `WALKIE_WEB_DIST`, `WALKIE_CAPTION_FONT`, `WALKIE_API`, `WALKIE_URL`); marker `data-stepcast-redact` → `data-walkie-redact`. No fallbacks to old names.
 - Past design and plan documents dated before 2026-10-26 are not rewritten.
 - No new runtime dependencies; animations in CSS/SVG only.
@@ -76,11 +76,11 @@ The README screenshots still show the old wordmark; Task 5 retakes them.
 ### Task 2: Which view to show (first-visit rule)
 
 **Files:**
-- Create: `web/src/landing.ts`, `web/src/landing.test.ts`
+- Create: `web/src/firstVisit.ts`, `web/src/landing.test.ts`
 - Modify: `web/src/App.tsx`, `web/src/Library.tsx` (an "About Walkie" link to `#/welcome` next to Settings in the top bar)
 
 **Interfaces:**
-- Produces (in `web/src/landing.ts`):
+- Produces (in `web/src/firstVisit.ts`):
   - `export const GITHUB_URL = "https://github.com/aravindsriraj/walkie";`
   - `export type View = { name: "landing" } | { name: "library" } | { name: "editor"; id: string };`
   - `export function pickView(hash: string, seen: boolean): View` — `#/a/<12 hex>` → editor; `#/welcome` → landing; anything else → landing if `!seen`, else library.

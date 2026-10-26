@@ -250,7 +250,7 @@ export function Landing({ onStart }: { onStart: () => void }) {
         <section className="l-section l-own" id="open-source">
           <h2>Runs on your machine</h2>
           <ul>
-            <li><b>Your recordings stay with you.</b> Only the AI calls leave your computer, using your own Gemini API key.</li>
+            <li><b>Your recordings stay with you.</b> They leave your computer only for the AI calls, which use your own Gemini API key.</li>
             <li><b>No accounts, no tracking.</b> Walkie is for one team on one machine or a private network.</li>
             <li><b>Open source.</b> Apache-2.0: read it, change it, run it wherever you like.</li>
           </ul>
