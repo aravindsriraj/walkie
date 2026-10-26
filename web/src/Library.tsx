@@ -126,7 +126,7 @@ export function Library() {
 
   return (
     <>
-      <TopBar><SettingsButton />{articles && articles.length > 0 && <NewArticleButton />}</TopBar>
+      <TopBar><a className="button" href="#/welcome">About Walkie</a><SettingsButton />{articles && articles.length > 0 && <NewArticleButton />}</TopBar>
       <main className="library">
         {error && <div className="notice"><h1>Server not running</h1><p>{error}</p><p><code>uv run uvicorn app.api:app --host 127.0.0.1 --port 8000 --reload</code></p></div>}
         {articles && !articles.length && <FirstRun />}
