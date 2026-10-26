@@ -1,0 +1,50 @@
+{
+ "said": [
+  "I'm going to create a new deal in the CRM.",
+  "Uh so we should click this button and then choose the contact from the company.",
+  "Uh this is the deal name and the amount is",
+  "uh 25,000.",
+  "You can choose the stage.",
+  "I'm choosing as qualify.",
+  "Expected close date",
+  "is uh next month.",
+  "So you can choose the date here and once you review",
+  "uh you can create a new deal.",
+  "So yeah.",
+  "And you can view all the deals in the deals page.",
+  "And in the dashboard you can see all the pipeline value."
+ ],
+ "script": [
+  "Click New deal to start creating a deal in the CRM.",
+  "Choose the contact for the deal from the list.",
+  "Click Next to proceed to the deal details.",
+  "Enter the deal amount in the Amount (USD) field.",
+  "Choose a stage from the Stage dropdown.",
+  "Set a date in the Expected close date field.",
+  "Click Next to review the deal details.",
+  "Click Create deal to finalize your new deal.",
+  "Click Dashboard to return and view your updated pipeline value."
+ ],
+ "samples": {
+  "en": "Click Save to finish.",
+  "es": "Haz clic en Guardar para finalizar.",
+  "fr": "Cliquez sur Enregistrer pour terminer.",
+  "de": "Klicken Sie zum Abschließen auf „Speichern“.",
+  "it": "Fai clic su Salva per completare.",
+  "pt-BR": "Clique em Salvar para concluir.",
+  "nl": "Klik op Opslaan om te voltooien.",
+  "sv": "Klicka på Spara för att slutföra.",
+  "pl": "Kliknij Zapisz, aby zakończyć.",
+  "tr": "Bitirmek için Kaydet'e tıklayın.",
+  "ru": "Нажмите «Сохранить», чтобы завершить.",
+  "uk": "Натисніть Save, щоб завершити.",
+  "ar": "انقر على حفظ للإنهاء.",
+  "hi": "पूरा करने के लिए Save पर क्लिक करें।",
+  "id": "Klik Simpan untuk menyelesaikan.",
+  "vi": "Nhấp vào Lưu để hoàn tất.",
+  "th": "คลิก บันทึก เพื่อเสร็จสิ้น",
+  "ja": "[保存] をクリックして完了します。",
+  "ko": "완료하려면 저장을 클릭하세요.",
+  "zh-CN": "点击“保存”以完成。"
+ }
+}

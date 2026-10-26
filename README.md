@@ -289,6 +289,7 @@ cd web && npx vitest run
 cd e2e && npm install && npm test   # real extension in Chromium: record → article → video
 cd server && uv run python scripts/voice_samples.py out/   # voices in 5 languages: listen, plus word-error check
 cd server && uv run python scripts/check_highlights.py data/<article id>   # do upload outlines sit on the click?
+cd server && uv run python scripts/landing_media.py <article id>   # landing page videos + text, from a recording of e2e/site/crm
 ```
 
 </details>
