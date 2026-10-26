@@ -91,3 +91,7 @@ cd e2e && npm install && npm test   # real extension in Chromium: record → art
 cd server && uv run python scripts/voice_samples.py out/   # candidate voices: listen, plus word-error check
 cd server && uv run python scripts/check_highlights.py data/<article id>   # do upload outlines sit on the click?
 ```
+
+## License
+
+Apache-2.0, see [LICENSE](LICENSE). Copyright 2026 TR Aravindan.
