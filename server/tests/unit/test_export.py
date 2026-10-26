@@ -36,7 +36,7 @@ def test_docs_zip_has_video_and_every_language(article):
     assert {"article.md", "video.mp4", "video.vtt", "article.es.md", "video.es.mp4", "video.es.vtt",
             "images/1.png", "images/2.png"} <= names
     md = z.read("article.md").decode()
-    assert md.index("<video") < md.index("1. Click **Go**.") and 'src="video.vtt"' in md and 'srclang="en"' in md
+    assert md.index("<video") < md.index("1. Click **Go**.") and 'src="video.vtt"' in md and 'srcLang="en" label="English" default /></video>' in md
     es = z.read("article.es.md").decode()
     assert es.startswith("# Cómo ir") and "[es] Haz clic" in es and 'src="video.es.mp4"' in es
     assert "2. Click **Save**." in es  # an untranslated step falls back to the original text
@@ -61,3 +61,8 @@ def test_cues_round_trip_to_srt(tmp_path, monkeypatch, article):
     from app.export import srt
     (tmp_path / "a1/cues.en.json").write_text(json.dumps([{"start_ms": 250, "end_ms": 1500, "text": "Hi"}]))
     assert srt(article, "en") == "1\n00:00:00,250 --> 00:00:01,500\nHi\n"
+
+
+def test_mdx_safe_escapes_jsx_outside_code():
+    from app.export import mdx_safe
+    assert mdx_safe("Type {name} in <Name>, then `{x} <y>`") == "Type \\{name\\} in \\<Name>, then `{x} <y>`"

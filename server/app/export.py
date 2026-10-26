@@ -45,18 +45,24 @@ def _has_video(a: Article, lang: str) -> bool:
     return bool(v and v.version > 0 and (store.DATA_DIR / a.id / f"video.{lang}.mp4").exists())
 
 
+def mdx_safe(text: str) -> str:
+    """Escape what MDX (Mintlify, Docusaurus) reads as JSX, outside `code`. Plain Markdown shows it unchanged."""
+    return re.sub(r"(`[^`]*`)|([<{}])", lambda m: m[1] or "\\" + m[2], text)
+
+
 def _article_md(a: Article, lang: str, suffix: str) -> str:
     tr = a.translations.get(lang) if lang != a.lang else None
     title, intro, outro = (tr.title, tr.intro, tr.outro) if tr else (a.title, a.intro, a.outro)
-    lines = [f"# {title}", "", intro, ""]
+    lines = [f"# {mdx_safe(title)}", "", mdx_safe(intro), ""]
     if _has_video(a, lang):
         name = LANGUAGES.get(lang, lang)
+        # valid as both HTML and MDX: self-closed <track />, and srcLang (HTML ignores attribute case)
         lines += [f'<video controls width="100%" src="video{suffix}.mp4"><track kind="captions" '
-                  f'src="video{suffix}.vtt" srclang="{lang}" label="{name}" default></video>', ""]
+                  f'src="video{suffix}.vtt" srcLang="{lang}" label="{name}" default /></video>', ""]
     for n, step in enumerate(a.steps, 1):
         text = tr.steps[step.id].text if tr and step.id in tr.steps else step.text
-        lines += [f"{n}. {text}", "", f"   ![Step {n}](images/{n}.png)", ""]
-    lines.append(outro)
+        lines += [f"{n}. {mdx_safe(text)}", "", f"   ![Step {n}](images/{n}.png)", ""]
+    lines.append(mdx_safe(outro))
     return "\n".join(lines) + "\n"
 
 
