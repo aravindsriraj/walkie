@@ -12,7 +12,8 @@ const calm = () => window.matchMedia?.("(prefers-reduced-motion: reduce)").match
 
 function nativeName(code: string): string {
   try {
-    return new Intl.DisplayNames([code], { type: "language" }).of(code) ?? code;
+    const name = new Intl.DisplayNames([code], { type: "language" }).of(code) ?? code;
+    return name.charAt(0).toLocaleUpperCase(code) + name.slice(1); // "español" → "Español", like a menu item
   } catch {
     return code;
   }

@@ -56,7 +56,10 @@ You need [Docker](https://www.docker.com/products/docker-desktop/), Google Chrom
 
 3. **Load the recorder:** open `chrome://extensions`, turn on **Developer mode**, click **Load unpacked** and pick
    the `extension/` folder.
-4. **Open <http://localhost:8000>**
+4. **Open <http://localhost:8000>**. The first time, Walkie greets you with a short tour of what it does; **Start your
+   first walkthrough** takes you to your articles, and **About Walkie** on the home screen brings the tour back.
+
+   <img src="docs/media/landing.png" alt="Walkie's landing page: the headline, a Start your first walkthrough button and the demo video" width="720">
 
 Then open the page you want to document, click the Walkie icon → **Start recording**, walk through the task and
 click **Stop & create article**. The article opens first; the narrated video follows about a minute later under
