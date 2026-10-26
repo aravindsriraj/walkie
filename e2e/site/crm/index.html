@@ -1,0 +1,286 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Acme CRM</title>
+<!-- A made-up CRM for recording Walkie's landing page demo: several screens, a table, a side panel and a multi-step
+     dialog. Everything is fictional; emails use example.com. -->
+<style>
+  :root { --bg: #f5f6fa; --card: #fff; --ink: #1d2433; --muted: #6b7489; --line: #e4e7ef; --brand: #2563eb;
+    --brand-soft: #e8efff; --ok: #16a34a; --warn: #d97706; font: 14px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; color: var(--ink); }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); display: grid; grid-template-columns: 220px 1fr; height: 100vh; overflow: hidden; }
+  button, input, select, textarea { font: inherit; color: inherit; }
+  button { cursor: pointer; }
+  aside { background: #111827; color: #cbd2e1; padding: 18px 12px; display: flex; flex-direction: column; gap: 4px; }
+  .logo { display: flex; align-items: center; gap: 10px; color: #fff; font-weight: 700; font-size: 16px; padding: 4px 10px 18px; }
+  .logo i { width: 26px; height: 26px; border-radius: 7px; background: linear-gradient(135deg, #3b82f6, #8b5cf6); }
+  nav button { display: flex; width: 100%; align-items: center; gap: 10px; padding: 9px 12px; border: 0; border-radius: 8px;
+    background: none; color: inherit; text-align: left; }
+  nav button:hover { background: #1f2937; }
+  nav button.on { background: #1f2937; color: #fff; font-weight: 600; }
+  nav svg { width: 17px; height: 17px; opacity: .85; }
+  .me { margin-top: auto; display: flex; gap: 10px; align-items: center; padding: 10px; font-size: 13px; }
+  .avatar { width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; font-weight: 700; font-size: 12px;
+    color: #fff; flex: none; }
+  main { overflow: auto; }
+  header { display: flex; align-items: center; justify-content: space-between; padding: 18px 28px; border-bottom: 1px solid var(--line);
+    background: var(--card); position: sticky; top: 0; z-index: 2; }
+  header h1 { margin: 0; font-size: 20px; }
+  .btn { border: 1px solid var(--line); background: var(--card); border-radius: 8px; padding: 8px 14px; font-weight: 600; }
+  .btn.primary { background: var(--brand); border-color: var(--brand); color: #fff; }
+  .btn:disabled { opacity: .5; cursor: default; }
+  .page { padding: 24px 28px; display: none; }
+  .page.on { display: block; }
+  .kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 16px 18px; }
+  .kpi small { color: var(--muted); } .kpi b { display: block; font-size: 24px; margin-top: 4px; }
+  .kpi em { font-style: normal; color: var(--ok); font-size: 12px; font-weight: 600; }
+  .row2 { display: grid; grid-template-columns: 1.6fr 1fr; gap: 16px; margin-top: 16px; }
+  .card h3 { margin: 0 0 12px; font-size: 15px; }
+  .bars { display: flex; align-items: flex-end; gap: 14px; height: 170px; padding-top: 10px; }
+  .bars div { flex: 1; background: var(--brand-soft); border-radius: 6px 6px 0 0; position: relative; }
+  .bars div.now { background: var(--brand); }
+  .bars span { position: absolute; bottom: -22px; left: 0; right: 0; text-align: center; font-size: 11px; color: var(--muted); }
+  .feed { list-style: none; margin: 0; padding: 0; } .feed li { display: flex; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--line); font-size: 13px; }
+  .feed li:last-child { border: 0; } .feed time { margin-left: auto; color: var(--muted); }
+  .tools { display: flex; gap: 10px; align-items: center; margin-bottom: 14px; }
+  .search { flex: 1; max-width: 360px; padding: 8px 12px; border: 1px solid var(--line); border-radius: 8px; background: var(--card); }
+  .chips button { border: 1px solid var(--line); background: var(--card); border-radius: 99px; padding: 5px 12px; font-size: 13px; }
+  .chips button.on { background: var(--ink); color: #fff; border-color: var(--ink); }
+  table { width: 100%; border-collapse: collapse; background: var(--card); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+  th, td { text-align: left; padding: 11px 16px; border-bottom: 1px solid var(--line); }
+  th { font-size: 12px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); background: #fafbfd; }
+  tbody tr { cursor: pointer; } tbody tr:hover { background: #f8faff; }
+  td .who { display: flex; align-items: center; gap: 10px; font-weight: 600; }
+  .tag { font-size: 12px; font-weight: 600; padding: 2px 9px; border-radius: 99px; }
+  .tag.customer { background: #dcfce7; color: #166534; } .tag.lead { background: #fef3c7; color: #92400e; }
+  .panel { position: fixed; top: 0; right: 0; bottom: 0; width: 380px; background: var(--card); border-left: 1px solid var(--line);
+    transform: translateX(100%); transition: transform .25s ease; z-index: 5; padding: 22px; }
+  .panel.on { transform: none; box-shadow: -12px 0 32px rgb(17 24 39 / .1); }
+  .panel .close { position: absolute; top: 14px; right: 14px; border: 0; background: none; font-size: 22px; color: var(--muted); }
+  .panel dl { display: grid; grid-template-columns: 90px 1fr; gap: 8px; margin: 18px 0; font-size: 13px; }
+  .panel dt { color: var(--muted); } .panel dd { margin: 0; }
+  .board { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+  .col { background: #eceef4; border-radius: 12px; padding: 12px; min-height: 380px; }
+  .col h4 { margin: 0 0 10px; font-size: 13px; display: flex; justify-content: space-between; color: #374151; }
+  .deal { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; margin-bottom: 10px; font-size: 13px; }
+  .deal b { display: block; } .deal span { color: var(--muted); }
+  .deal.new { border-color: var(--brand); box-shadow: 0 0 0 3px var(--brand-soft); animation: pop .5s ease; }
+  @keyframes pop { from { transform: scale(.94); opacity: 0; } }
+  .scrim { position: fixed; inset: 0; background: rgb(17 24 39 / .45); display: none; place-items: center; z-index: 10; }
+  .scrim.on { display: grid; }
+  .modal { width: 520px; background: var(--card); border-radius: 14px; box-shadow: 0 24px 60px rgb(0 0 0 / .25); }
+  .modal header { position: static; border-radius: 14px 14px 0 0; }
+  .steps { display: flex; gap: 8px; padding: 14px 22px 0; font-size: 12px; color: var(--muted); }
+  .steps span { flex: 1; border-top: 3px solid var(--line); padding-top: 6px; } .steps span.on { border-color: var(--brand); color: var(--ink); font-weight: 600; }
+  .modal .body { padding: 18px 22px; display: grid; gap: 14px; min-height: 230px; align-content: start; }
+  label { display: grid; gap: 5px; font-size: 13px; font-weight: 600; }
+  label input, label select, label textarea { padding: 9px 11px; border: 1px solid var(--line); border-radius: 8px; font-weight: 400; background: #fff; }
+  .pick { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px; background: #fff; text-align: left; width: 100%; }
+  .pick.on { border-color: var(--brand); background: var(--brand-soft); }
+  .modal footer { display: flex; justify-content: space-between; padding: 14px 22px; border-top: 1px solid var(--line); }
+  .review { background: var(--bg); border-radius: 10px; padding: 12px 14px; font-size: 13px; }
+  .toast { position: fixed; bottom: 22px; left: 50%; transform: translate(-50%, 120px); background: #111827; color: #fff; padding: 11px 18px;
+    border-radius: 10px; font-weight: 600; transition: transform .3s ease; z-index: 20; }
+  .toast.on { transform: translate(-50%, 0); }
+  .settings { max-width: 560px; display: grid; gap: 14px; }
+</style>
+</head>
+<body>
+<aside>
+  <div class="logo"><i></i>Acme CRM</div>
+  <nav aria-label="Main">
+    <button data-go="dashboard" class="on"><svg viewBox="0 0 20 20" fill="currentColor"><path d="M3 3h6v8H3zM11 3h6v5h-6zM11 10h6v7h-6zM3 13h6v4H3z"/></svg>Dashboard</button>
+    <button data-go="contacts"><svg viewBox="0 0 20 20" fill="currentColor"><circle cx="10" cy="6" r="3.5"/><path d="M3 17c.6-3.6 3.5-5.5 7-5.5s6.4 1.9 7 5.5z"/></svg>Contacts</button>
+    <button data-go="deals"><svg viewBox="0 0 20 20" fill="currentColor"><path d="M2 4h4v12H2zM8 4h4v8H8zM14 4h4v5h-4z"/></svg>Deals</button>
+    <button data-go="reports"><svg viewBox="0 0 20 20" fill="currentColor"><path d="M3 17V9h3v8zM8.5 17V4h3v13zM14 17v-6h3v6z"/></svg>Reports</button>
+    <button data-go="settings"><svg viewBox="0 0 20 20" fill="currentColor"><path d="M10 6.5a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7zM9 1h2l.5 2.5 2 .9 2.2-1.4 1.4 1.4-1.4 2.2.9 2 2.4.4v2l-2.4.5-.9 2 1.4 2.2-1.4 1.4-2.2-1.4-2 .9L11 19H9l-.5-2.5-2-.9-2.2 1.4-1.4-1.4 1.4-2.2-.9-2L1 11V9l2.5-.5.9-2L3 4.3l1.4-1.4 2.2 1.4 2-.9z"/></svg>Settings</button>
+  </nav>
+  <div class="me"><span class="avatar" style="background:#8b5cf6">JR</span><div>Jordan Reyes<br><small>Sales lead</small></div></div>
+</aside>
+
+<main>
+  <header><h1 id="title">Dashboard</h1><button class="btn primary" id="new-deal">+ New deal</button></header>
+
+  <section class="page on" id="dashboard">
+    <div class="kpis">
+      <div class="card kpi"><small>Pipeline value</small><b>$482,300</b><em>▲ 12% this month</em></div>
+      <div class="card kpi"><small>Won this month</small><b>$96,800</b><em>▲ 8%</em></div>
+      <div class="card kpi"><small>Open deals</small><b id="open-count">24</b><em>▲ 3 new</em></div>
+      <div class="card kpi"><small>Win rate</small><b>31%</b><em>▲ 2 pts</em></div>
+    </div>
+    <div class="row2">
+      <div class="card"><h3>Revenue by month</h3>
+        <div class="bars"><div style="height:42%"><span>May</span></div><div style="height:55%"><span>Jun</span></div><div style="height:48%"><span>Jul</span></div><div style="height:66%"><span>Aug</span></div><div style="height:72%"><span>Sep</span></div><div class="now" style="height:84%"><span>Oct</span></div></div>
+      </div>
+      <div class="card"><h3>Recent activity</h3>
+        <ul class="feed">
+          <li><b>Priya</b> moved Kettle &amp; Co to Proposal<time>2h</time></li>
+          <li><b>Sam</b> logged a call with Orbit Freight<time>4h</time></li>
+          <li><b>Jordan</b> won Pinecrest Labs<time>1d</time></li>
+          <li><b>Lee</b> added 3 contacts<time>2d</time></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="page" id="contacts">
+    <div class="tools">
+      <input class="search" id="search" type="search" placeholder="Search contacts" aria-label="Search contacts">
+      <div class="chips" role="group" aria-label="Filter"><button class="on" data-f="all">All</button> <button data-f="customer">Customers</button> <button data-f="lead">Leads</button></div>
+    </div>
+    <table><thead><tr><th>Name</th><th>Company</th><th>Email</th><th>Status</th><th>Owner</th></tr></thead><tbody id="rows"></tbody></table>
+  </section>
+
+  <section class="page" id="deals"><div class="board" id="board"></div></section>
+
+  <section class="page" id="reports"><div class="card"><h3>Reports</h3><p>Win rate by owner, deal velocity and forecast reports live here.</p></div></section>
+
+  <section class="page" id="settings">
+    <div class="card settings"><h3>Workspace</h3>
+      <label>Workspace name<input value="Acme Sales"></label>
+      <label>Currency<select><option>USD ($)</option><option>EUR (€)</option><option>GBP (£)</option></select></label>
+      <label>Default deal stage<select><option>Qualified</option><option>Proposal</option></select></label>
+    </div>
+  </section>
+</main>
+
+<div class="panel" id="panel" aria-hidden="true">
+  <button class="close" id="panel-close" aria-label="Close">×</button>
+  <div class="who" style="display:flex;gap:12px;align-items:center"><span class="avatar" id="p-avatar"></span><div><b id="p-name" style="font-size:18px"></b><br><span id="p-role" style="color:var(--muted)"></span></div></div>
+  <dl><dt>Company</dt><dd id="p-company"></dd><dt>Email</dt><dd id="p-email"></dd><dt>Phone</dt><dd id="p-phone"></dd><dt>Status</dt><dd id="p-status"></dd><dt>Owner</dt><dd id="p-owner"></dd></dl>
+  <button class="btn primary" id="panel-deal">Create deal for this contact</button>
+</div>
+
+<div class="scrim" id="scrim">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="m-title">
+    <header><h1 id="m-title" style="font-size:17px">New deal</h1><button class="btn" id="m-cancel">Cancel</button></header>
+    <div class="steps"><span data-s="0" class="on">1. Contact</span><span data-s="1">2. Details</span><span data-s="2">3. Review</span></div>
+    <div class="body" id="m-body"></div>
+    <footer><button class="btn" id="m-back">Back</button><button class="btn primary" id="m-next">Next</button></footer>
+  </div>
+</div>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+const COLORS = ["#2563eb", "#db2777", "#059669", "#d97706", "#7c3aed", "#0891b2"];
+const contacts = [
+  ["Maya Chen", "Brightline Studio", "Head of Operations", "customer", "Jordan Reyes"],
+  ["Luis Ortega", "Kettle & Co", "Founder", "lead", "Priya Shah"],
+  ["Hannah Okafor", "Pinecrest Labs", "VP Engineering", "customer", "Jordan Reyes"],
+  ["Tom Becker", "Orbit Freight", "Logistics Manager", "lead", "Sam Lee"],
+  ["Aiko Tanaka", "Lumen Health", "Chief of Staff", "lead", "Priya Shah"],
+  ["Ravi Menon", "Fieldnote", "Product Lead", "customer", "Sam Lee"],
+  ["Elena Rossi", "Harbor Goods", "Buyer", "lead", "Jordan Reyes"],
+].map(([name, company, role, status, owner], i) => ({ name, company, role, status, owner, color: COLORS[i % COLORS.length],
+  email: name.toLowerCase().replace(" ", ".") + "@example.com", phone: `+1 (555) 01${i}-23${i}${i}` }));
+const deals = {
+  Qualified: [["Harbor Goods rollout", "$18,000"], ["Lumen Health pilot", "$9,500"]],
+  Proposal: [["Kettle & Co annual", "$42,000"]],
+  Negotiation: [["Orbit Freight expansion", "$64,000"], ["Fieldnote seats", "$12,400"]],
+  Won: [["Pinecrest Labs renewal", "$38,000"]],
+};
+const $ = (s) => document.querySelector(s);
+const initials = (n) => n.split(" ").map((w) => w[0]).join("");
+const titles = { dashboard: "Dashboard", contacts: "Contacts", deals: "Deals", reports: "Reports", settings: "Settings" };
+
+function go(page) {
+  document.querySelectorAll("nav button").forEach((b) => b.classList.toggle("on", b.dataset.go === page));
+  document.querySelectorAll(".page").forEach((p) => p.classList.toggle("on", p.id === page));
+  $("#title").textContent = titles[page];
+  closePanel();
+}
+document.querySelectorAll("nav button").forEach((b) => b.onclick = () => go(b.dataset.go));
+
+let filter = "all";
+function renderRows() {
+  const q = $("#search").value.trim().toLowerCase();
+  $("#rows").innerHTML = contacts.map((c, i) => ({ c, i }))
+    .filter(({ c }) => (filter === "all" || c.status === filter) && (c.name + c.company).toLowerCase().includes(q))
+    .map(({ c, i }) => `<tr data-i="${i}"><td><span class="who"><span class="avatar" style="background:${c.color}">${initials(c.name)}</span>${c.name}</span></td>
+      <td>${c.company}</td><td>${c.email}</td><td><span class="tag ${c.status}">${c.status === "customer" ? "Customer" : "Lead"}</span></td><td>${c.owner}</td></tr>`).join("");
+  document.querySelectorAll("#rows tr").forEach((tr) => tr.onclick = () => openPanel(contacts[tr.dataset.i]));
+}
+$("#search").oninput = renderRows;
+document.querySelectorAll(".chips button").forEach((b) => b.onclick = () => {
+  filter = b.dataset.f;
+  document.querySelectorAll(".chips button").forEach((x) => x.classList.toggle("on", x === b));
+  renderRows();
+});
+
+let current = null;
+function openPanel(c) {
+  current = c;
+  $("#p-avatar").textContent = initials(c.name); $("#p-avatar").style.background = c.color;
+  $("#p-name").textContent = c.name; $("#p-role").textContent = c.role;
+  $("#p-company").textContent = c.company; $("#p-email").textContent = c.email; $("#p-phone").textContent = c.phone;
+  $("#p-status").textContent = c.status === "customer" ? "Customer" : "Lead"; $("#p-owner").textContent = c.owner;
+  $("#panel").classList.add("on"); $("#panel").setAttribute("aria-hidden", "false");
+}
+function closePanel() { $("#panel").classList.remove("on"); $("#panel").setAttribute("aria-hidden", "true"); }
+$("#panel-close").onclick = closePanel;
+
+function renderBoard(fresh) {
+  $("#board").innerHTML = Object.entries(deals).map(([stage, list]) => `<div class="col"><h4>${stage}<span>${list.length}</span></h4>
+    ${list.map(([name, amount]) => `<div class="deal${fresh === name ? " new" : ""}"><b>${name}</b><span>${amount}</span></div>`).join("")}</div>`).join("");
+}
+
+// New deal: 1. contact, 2. details, 3. review.
+let step = 0, draft = {};
+function openModal(contact) {
+  draft = { contact: contact || null, name: "", amount: "", stage: "Qualified", close: "", note: "" };
+  step = contact ? 1 : 0;
+  $("#scrim").classList.add("on"); renderStep();
+}
+function closeModal() { $("#scrim").classList.remove("on"); }
+function renderStep() {
+  document.querySelectorAll(".steps span").forEach((s) => s.classList.toggle("on", +s.dataset.s <= step));
+  const b = $("#m-body");
+  if (step === 0) {
+    b.innerHTML = `<label>Find a contact<input id="m-find" placeholder="Type a name or company"></label><div id="m-picks" style="display:grid;gap:8px"></div>`;
+    const picks = () => {
+      const q = $("#m-find").value.toLowerCase();
+      $("#m-picks").innerHTML = contacts.filter((c) => (c.name + c.company).toLowerCase().includes(q)).slice(0, 4).map((c) =>
+        `<button class="pick${draft.contact === c ? " on" : ""}" data-n="${c.name}"><span class="avatar" style="background:${c.color}">${initials(c.name)}</span><span><b>${c.name}</b><br><small>${c.company}</small></span></button>`).join("");
+      document.querySelectorAll(".pick").forEach((p) => p.onclick = () => { draft.contact = contacts.find((c) => c.name === p.dataset.n); picks(); sync(); });
+    };
+    $("#m-find").oninput = picks; picks();
+  } else if (step === 1) {
+    b.innerHTML = `<label>Deal name<input id="m-name" value="${draft.name || draft.contact.company + " expansion"}"></label>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px"><label>Amount (USD)<input id="m-amount" inputmode="numeric" placeholder="25,000" value="${draft.amount}"></label>
+      <label>Stage<select id="m-stage">${Object.keys(deals).filter((s) => s !== "Won").map((s) => `<option${s === draft.stage ? " selected" : ""}>${s}</option>`).join("")}</select></label></div>
+      <label>Expected close date<input id="m-close" type="date" value="${draft.close}"></label>`;
+    ["name", "amount", "stage", "close"].forEach((k) => $("#m-" + k).oninput = (e) => { draft[k] = e.target.value; sync(); });
+    draft.name = $("#m-name").value;
+  } else {
+    b.innerHTML = `<div class="review"><b>${draft.name}</b><br>${draft.contact.name} · ${draft.contact.company}<br>$${draft.amount} · ${draft.stage}${draft.close ? " · closes " + draft.close : ""}</div>
+      <label>Note for the team<textarea id="m-note" rows="3" placeholder="What did they ask for?">${draft.note}</textarea></label>`;
+    $("#m-note").oninput = (e) => draft.note = e.target.value;
+  }
+  $("#m-back").style.visibility = step === 0 ? "hidden" : "visible";
+  $("#m-next").textContent = step === 2 ? "Create deal" : "Next";
+  sync();
+}
+function sync() {
+  $("#m-next").disabled = (step === 0 && !draft.contact) || (step === 1 && !(draft.name && draft.amount));
+}
+$("#m-back").onclick = () => { step--; renderStep(); };
+$("#m-cancel").onclick = closeModal;
+$("#m-next").onclick = () => {
+  if (step < 2) { step++; return renderStep(); }
+  const amount = "$" + Number(String(draft.amount).replace(/[^0-9.]/g, "")).toLocaleString("en-US");
+  deals[draft.stage].unshift([draft.name, amount]);
+  $("#open-count").textContent = Object.entries(deals).filter(([s]) => s !== "Won").reduce((n, [, l]) => n + l.length, 0) + 19;
+  closeModal(); go("deals"); renderBoard(draft.name);
+  $("#toast").textContent = `Deal created: ${draft.name}`; $("#toast").classList.add("on");
+  setTimeout(() => $("#toast").classList.remove("on"), 2600);
+};
+$("#new-deal").onclick = () => openModal(null);
+$("#panel-deal").onclick = () => { const c = current; closePanel(); openModal(c); };
+
+renderRows(); renderBoard();
+</script>
+</body>
+</html>
