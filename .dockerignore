@@ -13,3 +13,5 @@ docs
 .claude
 .agents
 .tokensave
+web/dist-site
+web/site/public

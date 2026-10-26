@@ -24,7 +24,7 @@ from app.models import TDoc, TItem
 load_dotenv()
 LANGS = ["en", "es", "de", "fr", "ja"]
 SAMPLE = "Click Save to finish."
-OUT = Path(__file__).resolve().parents[2] / "web" / "public" / "landing"
+OUT = Path(__file__).resolve().parents[2] / "web" / "site" / "public" / "landing"
 
 
 def fetch(url: str) -> bytes:

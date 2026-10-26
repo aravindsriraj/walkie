@@ -114,6 +114,15 @@ The page also asks visitors to support the project by starring the GitHub reposi
   shows what they said (Walkie's transcript) beside the script Walkie wrote from it. The builder starts the demo app
   and tells the founder when to record.
 
+## Changed after the build (founder, 2026-10-26)
+
+- The landing page is a public website on GitHub Pages (`https://aravindsriraj.github.io/walkie/`), built from
+  `web/site`. Walkie itself no longer shows it: the app opens on the library, and **About Walkie** links to the site.
+- With no app behind it, the main button is **Get started**, linking to the README's Quick start; **Open Walkie** is
+  gone.
+- The 80-second launch video (Walkie's demo in three languages, then every feature, narrated by Walkie) is on the
+  page as "The whole thing in 80 seconds".
+
 ## My calls (please check)
 
 - The landing page is always dark, whatever the app's theme.

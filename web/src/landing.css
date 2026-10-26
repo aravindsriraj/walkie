@@ -11,6 +11,7 @@
   --glow: #c4b5fd;
   --amber: #f5b544;
   --measure: 64ch;
+  --font: "Geist", ui-sans-serif, system-ui, -apple-system, sans-serif;
   min-height: 100vh;
   background:
     radial-gradient(90% 60% at 50% -10%, #2d1b5c 0%, transparent 70%),
@@ -48,7 +49,7 @@
   border-bottom: 1px solid var(--line);
 }
 .l-wordmark { display: inline-flex; align-items: center; gap: 10px; font-weight: 700; font-size: 18px; letter-spacing: -0.02em; }
-.l-wordmark .mark { border-color: var(--glow); }
+.l-wordmark .mark { width: 18px; height: 13px; border: 2.5px solid var(--glow); border-radius: 4px; }
 .l-bar nav { display: flex; gap: 22px; margin-left: auto; font-size: 15px; }
 .l-bar nav a { color: var(--mute); text-decoration: none; }
 .l-bar nav a:hover { color: var(--ink); }
@@ -72,6 +73,8 @@
 }
 .l-channels button:hover, .l-langs button:hover { color: var(--ink); border-color: rgb(241 238 251 / 0.3); }
 .l-channels button[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: var(--night); }
+.l-tour { margin-top: 36px; }
+.l-tour video { aspect-ratio: 16 / 9; }
 .l-demo figcaption { margin-top: 14px; color: var(--mute); font-size: 14px; }
 
 /* Sections */

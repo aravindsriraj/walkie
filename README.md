@@ -9,7 +9,7 @@ in 20 languages, ready for your docs site.**
 ![Self-hosted](https://img.shields.io/badge/self--hosted-Docker-2496ED?logo=docker&logoColor=white)
 ![Powered by Gemini](https://img.shields.io/badge/AI-Gemini-8E75B2?logo=googlegemini&logoColor=white)
 
-[Quick start](#quick-start) · [How it works](#how-it-works) · [Tour](#tour) ·
+[Website](https://aravindsriraj.github.io/walkie/) · [Quick start](#quick-start) · [How it works](#how-it-works) · [Tour](#tour) ·
 [Docs sites](#publish-to-your-docs-site) · [FAQ](#faq) · [Developing](#developing)
 
 <img src="docs/media/demo.gif" alt="A tutorial video made by Walkie: zoom on each click, outlined fields, a blurred email address and captions" width="800">
@@ -56,10 +56,7 @@ You need [Docker](https://www.docker.com/products/docker-desktop/), Google Chrom
 
 3. **Load the recorder:** open `chrome://extensions`, turn on **Developer mode**, click **Load unpacked** and pick
    the `extension/` folder.
-4. **Open <http://localhost:8000>**. The first time, Walkie greets you with a short tour of what it does; **Start your
-   first walkthrough** takes you to your articles, and **About Walkie** on the home screen brings the tour back.
-
-   <img src="docs/media/landing.png" alt="Walkie's landing page: the headline, a Start your first walkthrough button and the demo video" width="720">
+4. **Open <http://localhost:8000>**
 
 Then open the page you want to document, click the Walkie icon → **Start recording**, walk through the task and
 click **Stop & create article**. The article opens first; the narrated video follows about a minute later under
@@ -271,6 +268,7 @@ Needs `uv`, Node 20+, `ffmpeg` 7 or newer, Chrome, and `GEMINI_API_KEY` in your 
 ```bash
 cd server && uv sync && uv run uvicorn app.api:app --host 127.0.0.1 --port 8000 --reload
 cd web && npm install && npm run dev          # http://localhost:5173, forwards API calls to :8000
+cd web && npm run dev:site                     # the website (web/site); npm run build:site builds it into web/dist-site
 ```
 
 Set the extension's address to `http://localhost:5173` while developing.
@@ -292,7 +290,7 @@ cd web && npx vitest run
 cd e2e && npm install && npm test   # real extension in Chromium: record → article → video
 cd server && uv run python scripts/voice_samples.py out/   # voices in 5 languages: listen, plus word-error check
 cd server && uv run python scripts/check_highlights.py data/<article id>   # do upload outlines sit on the click?
-cd server && uv run python scripts/landing_media.py <article id>   # landing page videos + text, from a recording of e2e/site/crm
+cd server && uv run python scripts/landing_media.py <article id>   # website demo videos + text, from a recording of e2e/site/crm
 ```
 
 </details>

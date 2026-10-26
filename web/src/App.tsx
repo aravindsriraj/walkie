@@ -1,7 +1,5 @@
 import { useEffect, useState } from "react";
 import { Editor } from "./Editor";
-import { Landing } from "./Landing";
-import { landingSeen, markLandingSeen, pickView } from "./firstVisit";
 import { Library } from "./Library";
 
 function useHash() {
@@ -15,12 +13,6 @@ function useHash() {
 }
 
 export default function App() {
-  const hash = useHash();
-  const [seen, setSeen] = useState(() => landingSeen());
-  const view = pickView(hash, seen);
-  if (view.name === "editor") return <Editor key={view.id} id={view.id} />;
-  if (view.name === "landing") {
-    return <Landing onStart={() => { markLandingSeen(); setSeen(true); location.hash = "#/"; }} />;
-  }
-  return <Library />;
+  const id = useHash().match(/^#\/a\/([0-9a-f]{12})$/)?.[1];
+  return id ? <Editor key={id} id={id} /> : <Library />;
 }

@@ -2,7 +2,7 @@
 import { act } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import { afterEach, beforeEach, expect, test, vi } from "vitest";
-import { GITHUB_URL } from "./firstVisit";
+import { GITHUB_URL } from "./links";
 import { Landing } from "./Landing";
 
 const FIXTURE = {
@@ -30,20 +30,21 @@ afterEach(() => {
   vi.unstubAllGlobals();
 });
 
-async function show(onStart = () => {}) {
+async function show() {
   root = createRoot(box);
-  await act(async () => root.render(<Landing onStart={onStart} />));
+  await act(async () => root.render(<Landing />));
 }
 
 const buttons = (name: string) => [...box.querySelectorAll("button")].filter((b) => b.textContent?.trim() === name);
 
-test("the hero says what Walkie does and the main button calls onStart", async () => {
-  const onStart = vi.fn();
-  await show(onStart);
+test("the hero says what Walkie does, and Get started goes to the README's quick start", async () => {
+  await show();
   expect(box.textContent).toContain("Walk through it once. Walkie does the talking.");
   expect(box.textContent).toContain("A narrated tutorial video and help article, in 20 languages, ready for your docs site.");
-  await act(async () => buttons("Start your first walkthrough")[0].click());
-  expect(onStart).toHaveBeenCalledTimes(1);
+  const starts = [...box.querySelectorAll("a")].filter((a) => a.textContent?.trim() === "Get started");
+  expect(starts.length).toBeGreaterThanOrEqual(2);
+  for (const a of starts) expect(a.getAttribute("href")).toBe(`${GITHUB_URL}#quick-start`);
+  expect(box.textContent).not.toContain("Open Walkie");
 });
 
 test("star links go to the GitHub repo", async () => {
@@ -56,12 +57,20 @@ test("star links go to the GitHub repo", async () => {
 test("choosing a language switches the video and captions, even if play() is refused", async () => {
   await show();
   await act(async () => buttons("Español")[0].click());
-  expect(box.querySelector("video")?.getAttribute("src")).toMatch(/\/landing\/es\.mp4$/);
-  expect(box.querySelector("video track")?.getAttribute("src")).toMatch(/\/landing\/es\.vtt$/);
+  expect(box.querySelector("video")?.getAttribute("src")).toBe("landing/es.mp4");
+  expect(box.querySelector("video track")?.getAttribute("src")).toBe("landing/es.vtt");
 });
 
 test("the rough take and the script come from landing.json", async () => {
   await show();
   expect(box.textContent).toContain(FIXTURE.said[0]);
   expect(box.textContent).toContain(FIXTURE.script[0]);
+});
+
+test("the 80-second tour video is on the page, playing only when asked", async () => {
+  await show();
+  const tour = box.querySelector<HTMLVideoElement>("video[data-tour]");
+  expect(tour?.getAttribute("src")).toBe("landing/tour.mp4");
+  expect(tour?.getAttribute("poster")).toBe("landing/tour.jpg");
+  expect(tour?.autoplay).toBe(false);
 });

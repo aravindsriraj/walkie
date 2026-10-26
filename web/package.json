@@ -7,7 +7,9 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "build:site": "tsc -b && vite build --config vite.site.config.ts",
+    "dev:site": "vite --config vite.site.config.ts"
   },
   "dependencies": {
     "react": "^19.1.0",

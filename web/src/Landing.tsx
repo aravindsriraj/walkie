@@ -1,5 +1,5 @@
 import { type CSSProperties, type MouseEvent, useEffect, useRef, useState } from "react";
-import { GITHUB_URL } from "./firstVisit";
+import { GITHUB_URL } from "./links";
 import "./landing.css";
 
 type Media = { said: string[]; script: string[]; samples: Record<string, string> };
@@ -76,9 +76,9 @@ function Demo() {
   return (
     <figure className="l-demo">
       <div className="l-screen">
-        <video ref={video} src={`/landing/${lang}.mp4`} muted playsInline loop controls preload="metadata"
+        <video ref={video} src={`landing/${lang}.mp4`} muted playsInline loop controls preload="metadata"
           aria-label="A tutorial video Walkie made from one recording of a demo CRM">
-          <track key={lang} kind="captions" src={`/landing/${lang}.vtt`} srcLang={lang} label={nativeName(lang)} default />
+          <track key={lang} kind="captions" src={`landing/${lang}.vtt`} srcLang={lang} label={nativeName(lang)} default />
         </video>
         <button className="l-sound" onClick={() => setMuted((m) => !m)} aria-pressed={!muted}>
           {muted ? "Sound on" : "Sound off"}
@@ -204,16 +204,19 @@ function Languages({ samples }: { samples: Record<string, string> }) {
   );
 }
 
-export function Landing({ onStart }: { onStart: () => void }) {
+// Media paths are relative so the page works wherever it's hosted (GitHub Pages serves it under /walkie/).
+const GET_STARTED = `${GITHUB_URL}#quick-start`;
+
+export function Landing() {
   const [media, setMedia] = useState<Media | null>(null);
   useEffect(() => {
     document.title = "Walkie: narrated tutorial videos from one walkthrough";
     let stop = false;
-    fetch("/landing/landing.json").then((r) => r.json()).then((m: Media) => { if (!stop) setMedia(m); }).catch(() => {});
+    fetch("landing/landing.json").then((r) => r.json()).then((m: Media) => { if (!stop) setMedia(m); }).catch(() => {});
     return () => { stop = true; };
   }, []);
 
-  const start = <button className="l-btn l-primary" onClick={onStart}>Start your first walkthrough</button>;
+  const start = <a className="l-btn l-primary" href={GET_STARTED} target="_blank" rel="noopener noreferrer">Get started</a>;
 
   return (
     <div className="landing">
@@ -225,7 +228,7 @@ export function Landing({ onStart }: { onStart: () => void }) {
           <a href="#languages" onClick={(e) => scrollTo(e, "languages")}>Languages</a>
           <a href={GITHUB_URL} target="_blank" rel="noopener noreferrer">★ GitHub</a>
         </nav>
-        <button className="l-btn l-small" onClick={onStart}>Open Walkie</button>
+        <a className="l-btn l-small" href={GET_STARTED} target="_blank" rel="noopener noreferrer">Get started</a>
       </header>
 
       <main>
@@ -241,6 +244,16 @@ export function Landing({ onStart }: { onStart: () => void }) {
         <section className="l-section" id="how">
           <h2>From one walkthrough to your docs</h2>
           <ol className="l-steps">{STEPS.map(([title, body], n) => <Step key={title} n={n} title={title} body={body} />)}</ol>
+        </section>
+
+        <section className="l-section" id="tour">
+          <h2>The whole thing in 80 seconds</h2>
+          <p className="l-lede">Made with Walkie's own output: the narrated demo in three languages, then every feature,
+            narrated by Walkie.</p>
+          <div className="l-screen l-tour">
+            <video data-tour src="landing/tour.mp4" poster="landing/tour.jpg" controls playsInline preload="none"
+              aria-label="An 80-second tour of Walkie" />
+          </div>
         </section>
 
         <Features />
