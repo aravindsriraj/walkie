@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Editor } from "./Editor";
 import { Landing } from "./Landing";
-import { landingSeen, markLandingSeen, pickView } from "./landing";
+import { landingSeen, markLandingSeen, pickView } from "./firstVisit";
 import { Library } from "./Library";
 
 function useHash() {

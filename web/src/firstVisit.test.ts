@@ -1,5 +1,5 @@
 import { expect, test } from "vitest";
-import { landingSeen, markLandingSeen, pickView } from "./landing";
+import { landingSeen, markLandingSeen, pickView } from "./firstVisit";
 
 test("first visit at the root shows the landing page, later visits the library", () => {
   expect(pickView("", false)).toEqual({ name: "landing" });
