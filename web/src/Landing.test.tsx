@@ -74,3 +74,11 @@ test("the 80-second tour video is on the page, playing only when asked", async (
   expect(tour?.getAttribute("poster")).toBe("landing/tour.jpg");
   expect(tour?.autoplay).toBe(false);
 });
+
+test("the page says what problem Walkie solves, right after the hero", async () => {
+  await show();
+  const problem = box.querySelector("#problem");
+  expect(problem?.querySelector("h2")?.textContent).toBe("A good tutorial video is still a production");
+  expect(problem?.querySelectorAll("li").length).toBe(4);
+  expect(box.querySelector(".l-hero")?.nextElementSibling).toBe(problem);
+});

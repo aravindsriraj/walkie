@@ -125,6 +125,13 @@ function RoughTake({ media }: { media: Media }) {
   );
 }
 
+const PAINS = [
+  ["Retakes", "One stumble and you record the whole thing again, or spend the evening cutting it in a video editor."],
+  ["Voice and screen drift apart", "Swap in an AI voice to skip the retakes, and the narration and the clicks stop lining up."],
+  ["Every language is a new project", "New voiceovers, a re-timed edit and new captions, for each language you support."],
+  ["The article is separate work", "The help article gets written again by hand, with its own set of screenshots."],
+];
+
 const STEPS = [
   ["Record", "Click through the task in Chrome with the Walkie extension, talking if you like. Or upload a screen recording you already have."],
   ["Edit the script as text", "Change a sentence and only that scene is re-recorded and re-rendered. Merge, delete, or hold a busy screen longer."],
@@ -223,6 +230,7 @@ export function Landing() {
       <header className="l-bar">
         <span className="l-wordmark"><span className="mark" aria-hidden="true" />Walkie</span>
         <nav aria-label="On this page">
+          <a href="#problem" onClick={(e) => scrollTo(e, "problem")}>Why Walkie</a>
           <a href="#how" onClick={(e) => scrollTo(e, "how")}>How it works</a>
           <a href="#features" onClick={(e) => scrollTo(e, "features")}>Features</a>
           <a href="#languages" onClick={(e) => scrollTo(e, "languages")}>Languages</a>
@@ -237,6 +245,17 @@ export function Landing() {
           <p className="l-sub">A narrated tutorial video and help article, in 20 languages, ready for your docs site.</p>
           <div className="l-actions">{start}<Star /></div>
           <Demo />
+        </section>
+
+        <section className="l-section l-problem" id="problem">
+          <h2>A good tutorial video is still a production</h2>
+          <p className="l-lede">If you look after customer education, you know how it goes. Every feature needs a video and
+            a help article, and both take far longer to make than they should.</p>
+          <ul>
+            {PAINS.map(([title, body]) => <li key={title}><h3>{title}</h3><p>{body}</p></li>)}
+          </ul>
+          <p className="l-answer">Walkie turns one rough walkthrough into all of it: the narrated video, the article, and
+            every language.</p>
         </section>
 
         {media && <RoughTake media={media} />}
