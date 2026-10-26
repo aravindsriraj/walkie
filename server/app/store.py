@@ -1,9 +1,12 @@
+import os
 import sqlite3
+import threading
+from collections.abc import Callable
 from pathlib import Path
 
 from app.models import Article
 
-DATA_DIR = Path(__file__).resolve().parent.parent / "data"
+DATA_DIR = Path(os.getenv("STEPCAST_DATA", Path(__file__).resolve().parent.parent / "data"))
 _db: Path = DATA_DIR / "stepcast.db"
 
 
@@ -31,6 +34,25 @@ def get(article_id: str) -> Article | None:
     return Article.model_validate_json(row[0]) if row else None
 
 
+_lock = threading.Lock()
+
+
+def update(article_id: str, change: Callable[[Article], Article]) -> Article | None:
+    """Read, change and save as one step, so a background job and an editor save never overwrite each other."""
+    with _lock:
+        a = get(article_id)
+        if a is None:
+            return None
+        a = change(a)
+        save(a)
+        return a
+
+
+def delete(article_id: str) -> None:
+    with _conn() as c:
+        c.execute("DELETE FROM articles WHERE id = ?", (article_id,))
+
+
 def list_all() -> list[Article]:
     with _conn() as c:
         rows = c.execute("SELECT data FROM articles ORDER BY created_at DESC").fetchall()
@@ -38,6 +60,11 @@ def list_all() -> list[Article]:
 
 
 def mark_interrupted() -> None:
+    """On startup: work that was running when the server stopped will never finish."""
     for a in list_all():
         if a.status == "processing":
-            save(a.model_copy(update={"status": "failed", "error": "Interrupted — please re-upload"}))
+            a = a.model_copy(update={"status": "failed", "error": "Interrupted — please re-upload"})
+        videos = {lang: v.model_copy(update={"status": "failed", "stage": "", "updating": [],
+                                             "error": "Stepcast was restarted while making this video. Try again."})
+                  if v.status == "rendering" else v for lang, v in a.videos.items()}
+        save(a.model_copy(update={"videos": videos}))

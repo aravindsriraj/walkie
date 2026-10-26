@@ -51,6 +51,20 @@ def build_parts(events: list[RecEvent], segments: list[Segment], frames_dir: Pat
     return parts
 
 
+def narration_parts(steps: list[Step], events: list[RecEvent], segments: list[Segment],
+                    frames_dir: Path) -> list[types.Part]:
+    """Finished steps (text + screenshot) in recorded order, with what the presenter said interleaved by time."""
+    parts = []
+    pending = sorted(segments, key=lambda s: s.start_ms)
+    for n, s in enumerate(sorted(steps, key=lambda s: events[s.event_ids[0]].t), 1):
+        while pending and pending[0].start_ms <= events[s.event_ids[0]].t:
+            parts.append(_said(pending.pop(0)))
+        parts.append(types.Part.from_text(text=f"[step {n}] {s.text}"))
+        parts.append(types.Part.from_bytes(data=_jpeg(frames_dir / f"{s.frame}_full.png"), mime_type="image/jpeg"))
+    parts.extend(_said(seg) for seg in pending)
+    return parts
+
+
 def _fallback_text(ev: RecEvent) -> str:
     label = ev.label or ev.tag or "the element"
     if ev.kind == "input":

@@ -1,4 +1,4 @@
-const API = "http://127.0.0.1:8000";
+let api = "http://localhost:8000"; // set from the Options page with each recording
 const MAX_MS = 10 * 60 * 1000;
 
 let recorder = null;
@@ -8,7 +8,19 @@ let timer = null;
 
 const tell = (msg) => chrome.runtime.sendMessage(msg);
 
-async function start({ streamId, mic, size }) {
+async function start({ streamId, mic, size, server }) {
+  if (server) api = server;
+  // Open the microphone first. The video timeline starts when the tab stream starts, while event times
+  // start when the recorder starts; any wait between the two (opening a mic takes 0.1–1 s) shifts every
+  // screenshot by that much. Tab stream → recorder must be back to back.
+  let audio = [];
+  if (mic) {
+    try {
+      audio = (await navigator.mediaDevices.getUserMedia({ audio: true })).getAudioTracks();
+    } catch {
+      // Mic not granted yet (see permission.html): record without narration.
+    }
+  }
   const { width, height } = size;
   const video = await navigator.mediaDevices.getUserMedia({
     video: { mandatory: {
@@ -16,14 +28,7 @@ async function start({ streamId, mic, size }) {
       minWidth: width, maxWidth: width, minHeight: height, maxHeight: height,
     } },
   });
-  tracks = video.getVideoTracks();
-  if (mic) {
-    try {
-      tracks.push(...(await navigator.mediaDevices.getUserMedia({ audio: true })).getAudioTracks());
-    } catch {
-      // Mic not granted yet (see permission.html): record without narration.
-    }
-  }
+  tracks = [...video.getVideoTracks(), ...audio];
   const mimeType = MediaRecorder.isTypeSupported("video/webm;codecs=vp9") ? "video/webm;codecs=vp9" : "video/webm";
   chunks = [];
   recorder = new MediaRecorder(new MediaStream(tracks), { mimeType, videoBitsPerSecond: 6_000_000 });
@@ -41,11 +46,11 @@ function stop(events) {
       const body = new FormData();
       body.append("video", new Blob(chunks, { type: "video/webm" }), "video.webm");
       body.append("events", JSON.stringify(events));
-      const res = await fetch(`${API}/recordings`, { method: "POST", body });
+      const res = await fetch(`${api}/recordings`, { method: "POST", body });
       if (!res.ok) throw new Error(`Upload failed (${res.status}): ${await res.text()}`);
       tell({ type: "uploaded", id: (await res.json()).id });
     } catch (e) {
-      tell({ type: "failed", error: `${e.message || e}. Is the Stepcast server running?` });
+      tell({ type: "failed", error: `${e.message || e}. Is Stepcast running at ${api}? Check the address in the extension's Options.` });
     }
   };
   recorder.stop();

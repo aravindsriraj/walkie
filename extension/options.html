@@ -1,0 +1,33 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Stepcast options</title>
+<style>
+  body { font: 15px system-ui, sans-serif; max-width: 480px; margin: 48px auto; padding: 0 16px; color: #18233a; }
+  h1 { font-size: 20px; margin: 0 0 6px; }
+  p { color: #5b6578; margin: 0 0 18px; }
+  label { display: block; font-weight: 600; margin-bottom: 6px; }
+  input { width: 100%; box-sizing: border-box; padding: 9px 11px; border: 1px solid #e3e6ec; border-radius: 8px; font: inherit; }
+  input:focus { outline: none; border-color: #6d28d9; }
+  .row { display: flex; gap: 8px; margin-top: 12px; }
+  button { padding: 8px 14px; border-radius: 8px; border: 1px solid #e3e6ec; background: #fff; font: inherit; font-weight: 600; cursor: pointer; }
+  button.primary { background: #6d28d9; border-color: #6d28d9; color: #fff; }
+  #result { margin-top: 14px; min-height: 1.4em; }
+  #result.ok { color: #067647; }
+  #result.bad { color: #b42318; }
+</style>
+</head>
+<body>
+  <h1>Stepcast address</h1>
+  <p>Where your Stepcast runs. Recordings are sent there, and articles open there.</p>
+  <label for="server">Address</label>
+  <input id="server" type="url" placeholder="http://localhost:8000" spellcheck="false">
+  <div class="row">
+    <button class="primary" id="save">Save</button>
+    <button id="test">Test connection</button>
+  </div>
+  <p id="result" role="status"></p>
+  <script src="options.js"></script>
+</body>
+</html>

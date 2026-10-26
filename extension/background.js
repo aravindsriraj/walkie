@@ -1,4 +1,6 @@
-const EDITOR = "http://localhost:5173";
+const DEFAULT_SERVER = "http://localhost:8000";
+// Where Stepcast runs (Options page). The same address serves the API and the editor.
+const server = async () => ((await chrome.storage.sync.get("server")).server || DEFAULT_SERVER).replace(/\/+$/, "");
 
 // In-memory recording state, mirrored to storage.session in case the worker is restarted.
 let rec = null; // { tabId, startedAt, events: [], error }
@@ -28,9 +30,9 @@ async function start(tabId, mic) {
   const size = await captureSize(tabId);
   const streamId = await chrome.tabCapture.getMediaStreamId({ targetTabId: tabId });
   await ensureOffscreen();
-  rec = { tabId, startedAt: null, events: [], recording: true, error: "" };
+  rec = { tabId, startedAt: null, events: [], recording: true, error: "", server: await server() };
   await persist();
-  await chrome.runtime.sendMessage({ target: "offscreen", type: "start", streamId, mic, size });
+  await chrome.runtime.sendMessage({ target: "offscreen", type: "start", streamId, mic, size, server: rec.server });
 }
 
 async function stop() {
@@ -46,7 +48,7 @@ async function stop() {
 async function finish(error, id) {
   if (rec) rec.error = error || "";
   await persist();
-  if (id) chrome.tabs.create({ url: `${EDITOR}/#/a/${id}` });
+  if (id) chrome.tabs.create({ url: `${rec?.server || (await server())}/#/a/${id}` });
   if (await chrome.offscreen.hasDocument()) await chrome.offscreen.closeDocument();
 }
 

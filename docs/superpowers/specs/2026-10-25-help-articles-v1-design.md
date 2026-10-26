@@ -112,7 +112,27 @@ v1 = the help-articles capability. The founder's original stack was Google ADK +
 - Redaction also covers **visible text containing an email** (e.g. "Signed in as …").
 - Models chosen per job after side-by-side runs: flash-lite matched 3.8-flash on step_writer for the demo but ignored the "describe values generically" rule, so step_writer stays on 3.8-flash; transcribe-model timestamps were exact where 3.8-flash's were 0.4–0.6 s off.
 - The extension records at the **page's own pixel size** (asked from the content script, capped at 4K). A fixed 4K 16:9 capture made Chrome letterbox non-16:9 tabs, shifting every highlight and blur box — found by the real-extension test. As a safety net (window resized mid-recording), the server crops each frame to where that event's page sits (`media.content_box`) before drawing highlights and blur.
+- The extension opens the microphone **before** the tab stream. The video timeline starts when the tab stream starts, event times when the recorder starts; waiting for the mic in between shifted every screenshot by the mic's start-up time (~1 s measured), showing stale screens with mismatched blur. The e2e test now fails if the first click's focus ring isn't within 250 ms of its logged time.
 - The real extension is tested end to end in Chromium (`e2e/`), including narration with the microphone swapped for a speech clip. Only the toolbar-icon click and the mic permission prompt are stood in for (a test switch and a stub).
+
+## Editor design (2026-10-25)
+
+Direction "The Manual" + a step rail: the editor *is* the article (what you edit is what readers get), with a slim rail of step thumbnails for jumping and drag-to-reorder.
+- Tokens: paper `#F6F7F9`, sheet `#FFFFFF`, ink `#18233A`, graphite `#5B6578`, rule `#E3E6EC`, one accent — the capture-highlight purple `#6D28D9` (dark mode has matching tokens). One family: Geist.
+- The one bold element: large light step numbers hanging in the left margin, purple on the active step. Library tiles reuse the highlight motif (purple outline on hover).
+- Step text edits as real formatting (**bold**, `code`), stored as the Markdown subset; model text is escaped before it becomes HTML.
+- Autosave (serialised, ~0.7 s after typing stops) replaces the Save button; delete and merge show an Undo toast. Share, open, Markdown, HTML and PDF live in one Share menu.
+- Click a screenshot to toggle zoom. Shortcuts: J/K step, ⌘↑/⌘↓ move, Z zoom, ⌘Z undo, ⌘B/⌘E bold/code, Esc leave text.
+- While processing, the server reports `stage`, `stage_total` and `frames`; the editor shows the stages and each screenshot as it's captured. Blocking ffmpeg/Pillow work runs in a worker thread so the API keeps answering during processing.
+- Library: thumbnail grid (first step's screenshot), search by title, a first-run guide when empty.
+
+## Uploaded videos and deleting (2026-10-25)
+
+- **Two ways to start** (New article): record with the extension, or upload a screen recording (`POST /uploads`, MP4/MOV/WebM, ≤2 GB, ≤10 min).
+- Uploads have no action log, so the pipeline rebuilds one, then runs unchanged: a small 2 fps copy goes to `gemini-3.8-flash`, which lists each action with its time, kind and label; then, on the exact frames the screenshots will use, it returns a box for the element and boxes for **every personal or secret item** (emails, phone numbers, people's names, avatars, addresses, passwords, card/account/ID numbers, keys and tokens).
+- PII is blurred automatically: every Gemini blur box is padded (≥8 px, half its height vertically) because its boxes hug text too tightly — a real upload left half an email readable before padding. Labels and typed values read from the video are masked for emails and long numbers before they can reach step text. The editor tells the user the steps and blurring were found by AI and to check before sharing.
+- Measured on a recording with known ground truth: all steps found, times within 0.1–0.4 s, every element located, email/password/header email fully blurred, ~25 s end to end.
+- **Delete** from the library tile or More → Delete article in the editor, always confirmed; it removes the database row and the recording/screenshot folder. Blocked while an article is being written (the background job would recreate it).
 
 ## Left to the builder
 

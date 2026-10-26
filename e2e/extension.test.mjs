@@ -1,9 +1,10 @@
 // Real-extension end-to-end test: loads extension/ into Chromium, records the demo app through tabCapture +
 // the offscreen MediaRecorder (with narration), stops, and checks upload → article → editor tab.
-// Needs the API (127.0.0.1:8000) and editor (localhost:5173) running. Run: npm install && npm test
+// Needs Stepcast running (STEPCAST_URL, default http://localhost:8000; STEPCAST_DATA if its data folder isn't
+// server/data). Run: npm install && npm test
 import { execFileSync } from "node:child_process";
 import crypto from "node:crypto";
-import { mkdtempSync, readFileSync } from "node:fs";
+import fs, { mkdtempSync, readFileSync } from "node:fs";
 import http from "node:http";
 import os from "node:os";
 import path from "node:path";
@@ -12,7 +13,8 @@ import { chromium } from "playwright";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const EXT = path.join(ROOT, "extension");
-const API = "http://127.0.0.1:8000";
+const API = (process.env.STEPCAST_URL ?? "http://localhost:8000").replace(/\/+$/, "");
+const DATA = process.env.STEPCAST_DATA ?? path.join(ROOT, "server/data");
 const SITE_PORT = 8090;
 const check = (ok, msg) => {
   if (!ok) throw new Error(`FAIL: ${msg}`);
@@ -50,6 +52,7 @@ const ctx = await chromium.launchPersistentContext(mkdtempSync(path.join(os.tmpd
 try {
   const sw = ctx.serviceWorkers()[0] ?? (await ctx.waitForEvent("serviceworker", { timeout: 15000 }));
   check(sw.url().startsWith(`chrome-extension://${id}/`), "extension loaded");
+  await sw.evaluate((server) => chrome.storage.sync.set({ server }), API); // what the Options page saves
 
   const popup = await ctx.newPage(); // stands in for the popup: sends the same messages popup.js does
   await popup.goto(`chrome-extension://${id}/popup.html`);
@@ -102,7 +105,7 @@ try {
   await page.selectOption("#vis", "Team"); await pause();
   await page.click("#create"); await page.waitForTimeout(1200);
 
-  const editorTab = ctx.waitForEvent("page", { predicate: (p) => p.url().includes("localhost:5173/#/a/"), timeout: 60000 });
+  const editorTab = ctx.waitForEvent("page", { predicate: (p) => p.url().startsWith(`${API}/#/a/`), timeout: 60000 });
   check((await send({ type: "stop" })).ok, "stop accepted");
   const articleId = (await editorTab).url().split("/").pop();
   check(/^[0-9a-f]{12}$/.test(articleId), `editor tab opened on the new article (${articleId})`);
@@ -116,17 +119,53 @@ try {
   check(a.steps.length >= 5, `${a.steps.length} steps: ${a.steps.map((s) => s.text).join(" | ")}`);
 
   const events = await (await fetch(`${API}/files/${articleId}/events.json`)).json();
-  check(events.filter((e) => e.kind !== "navigate").length === 10, "all 10 actions captured");
+  check(events.filter((e) => ["click", "input", "keydown"].includes(e.kind)).length === 10, "all 10 actions captured");
   check(!JSON.stringify(events).includes("hunter2"), "password never left the page");
   check(events.some((e) => e.redact.length > 0), "sensitive fields reported for blurring");
 
-  const video = path.join(ROOT, "server/data", articleId, "video.webm");
+  const video = path.join(DATA, articleId, "video.webm");
   const probe = (args) => execFileSync("ffprobe", ["-v", "error", ...args, "-of", "csv=p=0", video]).toString().trim();
   const [w, h] = probe(["-select_streams", "v", "-show_entries", "stream=width,height"]).split(",").map(Number);
   const vp = events[0].viewport;
   check(Math.abs(w - vp.w * vp.dpr) <= 2 && Math.abs(h - vp.h * vp.dpr) <= 2,
     `recorded at the page's own size (${w}x${h} for a ${vp.w}x${vp.h}@${vp.dpr} page), so highlights line up`);
   check(probe(["-show_entries", "stream=codec_type"]).includes("audio"), "narration track recorded");
+
+  // Sync: the first click draws a focus ring on a page that's been still since loading. In the video
+  // it must appear when the action log says the click happened, or screenshots show the wrong moment.
+  const mp4 = path.join(DATA, articleId, "video.mp4");
+  const click = events.find((e) => e.kind === "click");
+  const k = w / click.viewport.w;
+  const crop = [click.rect.w + 12, click.rect.h + 12, click.rect.x - 6, click.rect.y - 6].map((v) => Math.round(v * k));
+  const gray = (ms) => execFileSync("ffmpeg", ["-loglevel", "error", "-ss", (ms / 1000).toFixed(3), "-i", mp4,
+    "-frames:v", "1", "-vf", `crop=${crop.join(":")}`, "-f", "rawvideo", "-pix_fmt", "gray", "-"]);
+  const before = gray(200);
+  let changedAt = null;
+  for (let ms = 300; ms < click.t + 2000 && changedAt === null; ms += 33) {
+    const now = gray(ms);
+    if (now.reduce((sum, v, i) => sum + Math.abs(v - before[i]), 0) / now.length > 3) changedAt = ms;
+  }
+  const offset = changedAt === null ? Infinity : changedAt - click.t;
+  check(Math.abs(offset) <= 250, `video in sync with the action log (focus ring appears ${offset}ms from the logged click)`);
+
+  // The narrated video follows the article. Ready means the server's own sync check passed.
+  let v;
+  for (let i = 0; i < 300 && v?.status !== "ready" && v?.status !== "failed"; i++) {
+    await page.waitForTimeout(1000);
+    a = await (await fetch(`${API}/articles/${articleId}`)).json();
+    v = a.videos[a.lang];
+  }
+  check(v?.status === "ready", `narrated video ready ${v?.error ? `(error: ${v.error})` : ""}`);
+  check(a.steps.every((s) => s.narration.trim()), `narration written: ${a.steps.map((s) => s.narration).join(" | ")}`);
+  const out = path.join(DATA, articleId, `video.${a.lang}.mp4`);
+  const streams = execFileSync("ffprobe", ["-v", "error", "-show_entries", "stream=codec_type", "-of", "csv=p=0", out])
+    .toString().split("\n").filter(Boolean).sort();
+  check(streams.join() === "audio,video", "video has picture and voiceover");
+  const seconds = Number(execFileSync("ffprobe", ["-v", "error", "-show_entries", "format=duration", "-of", "csv=p=0", out]));
+  const mbPer2Min = (fs.statSync(out).size / 1e6) * (120 / seconds);
+  check(mbPer2Min < 20, `small enough for a docs repo (${mbPer2Min.toFixed(1)} MB per 2 minutes, ${seconds.toFixed(0)} s long)`);
+  const vtt = await (await fetch(`${API}/files/${articleId}/captions.${a.lang}.vtt`)).text();
+  check(vtt.startsWith("WEBVTT") && vtt.includes("-->"), "captions written");
   console.log("\nall extension checks passed");
 } finally {
   await ctx.close();

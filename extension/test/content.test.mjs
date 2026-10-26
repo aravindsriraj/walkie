@@ -3,7 +3,8 @@ import { createRequire } from "node:module";
 import { test } from "node:test";
 import { JSDOM } from "jsdom";
 
-const { targetOf, elementLabel, isSensitive, redactRects, makeEvent } = createRequire(import.meta.url)("../content.js");
+const { targetOf, elementLabel, isSensitive, redactRects, makeEvent, redactEvent, sameRects } =
+  createRequire(import.meta.url)("../content.js");
 
 function page(html) {
   const dom = new JSDOM(`<body>${html}</body>`, { url: "https://app.test/settings" });
@@ -50,4 +51,23 @@ test("redactRects finds email inputs and data-stepcast-redact, not plain fields"
 test("visible email text is redacted even outside form fields", () => {
   const doc = page('<header>Signed in as <b>ada@acme.com</b></header><p>No secrets here</p>');
   assert.equal(redactRects(doc).length, 1);
+});
+
+test("redactEvent reports only where to blur", () => {
+  const doc = page('<input type="password" value="x"><p>Signed in as ada@acme.com</p><button>Save</button>');
+  const ev = redactEvent(doc);
+  assert.equal(ev.kind, "redact");
+  assert.equal(ev.rect, null);
+  assert.equal(ev.label, "");
+  assert.equal(ev.redact.length, 2);
+  assert.ok(!JSON.stringify(ev).includes("ada@acme.com"));
+  assert.deepEqual(ev.viewport.w > 0, true);
+});
+
+test("sameRects ignores sub-pixel noise", () => {
+  const a = [{ x: 10.2, y: 20, w: 100, h: 30 }];
+  assert.equal(sameRects(a, [{ x: 10.4, y: 20.3, w: 100, h: 30 }]), true);
+  assert.equal(sameRects(a, [{ x: 14, y: 20, w: 100, h: 30 }]), false);
+  assert.equal(sameRects(a, []), false);
+  assert.equal(sameRects([], []), true);
 });

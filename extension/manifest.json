@@ -4,6 +4,7 @@
   "version": "0.1.0",
   "description": "Record a flow in your product and get a step-by-step help article.",
   "action": { "default_popup": "popup.html", "default_title": "Stepcast" },
+  "options_page": "options.html",
   "background": { "service_worker": "background.js" },
   "permissions": ["tabCapture", "offscreen", "storage"],
   "host_permissions": ["<all_urls>"],

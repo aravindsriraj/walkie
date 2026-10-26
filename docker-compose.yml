@@ -1,0 +1,13 @@
+services:
+  stepcast:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - GEMINI_API_KEY  # passed through from your shell, or set it in server/.env
+    env_file:
+      - path: server/.env
+        required: false
+    volumes:
+      - ./server/data:/app/server/data  # articles, recordings and videos stay on this machine
+    restart: unless-stopped

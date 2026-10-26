@@ -87,8 +87,23 @@
     };
   }
 
+  // Where to blur, with no action attached: sent when the page scrolls or changes, so the video stays blurred
+  // between clicks, not just at them.
+  function redactEvent(doc) {
+    const win = doc.defaultView;
+    return {
+      ts: Date.now(), kind: "redact", url: win.location.href,
+      viewport: { w: win.innerWidth, h: win.innerHeight, dpr: win.devicePixelRatio || 1 },
+      rect: null, label: "", tag: "", value: "", key: "", redact: redactRects(doc),
+    };
+  }
+
+  const near = (a, b) => Math.abs(a - b) < 1;
+  const sameRects = (a, b) =>
+    a.length === b.length && a.every((r, i) => near(r.x, b[i].x) && near(r.y, b[i].y) && near(r.w, b[i].w) && near(r.h, b[i].h));
+
   if (typeof module !== "undefined") {
-    module.exports = { targetOf, elementLabel, isSensitive, redactRects, makeEvent };
+    module.exports = { targetOf, elementLabel, isSensitive, redactRects, makeEvent, redactEvent, sameRects };
     return;
   }
 
@@ -98,9 +113,29 @@
   const lastTyped = new WeakMap();
   const send = (event) => chrome.runtime.sendMessage({ type: "event", event }).catch(() => {});
 
+  let lastRedact = [];
+  let redactTimer = 0;
+  // At most every 500 ms, and only when the boxes moved, appeared or went away.
+  function snapshotRedact() {
+    if (!recording || redactTimer) return;
+    redactTimer = setTimeout(() => {
+      redactTimer = 0;
+      if (!recording) return;
+      const ev = redactEvent(document);
+      if (sameRects(ev.redact, lastRedact)) return;
+      lastRedact = ev.redact;
+      send(ev);
+    }, 500);
+  }
+  addEventListener("scroll", snapshotRedact, true);
+  addEventListener("resize", snapshotRedact);
+  new MutationObserver(snapshotRedact).observe(document.documentElement, { childList: true, subtree: true, characterData: true });
+
   function start() {
     recording = true;
-    send({ ...makeEvent("navigate", document.documentElement), rect: null, label: document.title });
+    const first = makeEvent("navigate", document.documentElement);
+    lastRedact = first.redact;
+    send({ ...first, rect: null, label: document.title });
   }
 
   chrome.runtime.onMessage.addListener((msg, _sender, reply) => {

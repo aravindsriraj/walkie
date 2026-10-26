@@ -1,11 +1,13 @@
 import html
 import io
+import json
 import re
 import zipfile
 from collections.abc import Callable
 
 from app import store
-from app.models import Article, Step
+from app.captions import Cue, to_srt
+from app.models import LANGUAGES, Article, Step
 
 
 def md_inline(text: str) -> str:
@@ -37,14 +39,43 @@ def render_html(a: Article, img_src: Callable[[Step], str], autoprint: bool = Fa
 <ol>{''.join(items)}</ol><p class="outro">{md_inline(a.outro)}</p>{script}</body></html>"""
 
 
-def markdown_zip(a: Article) -> bytes:
+def _has_video(a: Article, lang: str) -> bool:
+    """A finished video exists (an older one still counts while a new one renders)."""
+    v = a.videos.get(lang)
+    return bool(v and v.version > 0 and (store.DATA_DIR / a.id / f"video.{lang}.mp4").exists())
+
+
+def _article_md(a: Article, lang: str, suffix: str) -> str:
+    tr = a.translations.get(lang) if lang != a.lang else None
+    title, intro, outro = (tr.title, tr.intro, tr.outro) if tr else (a.title, a.intro, a.outro)
+    lines = [f"# {title}", "", intro, ""]
+    if _has_video(a, lang):
+        name = LANGUAGES.get(lang, lang)
+        lines += [f'<video controls width="100%" src="video{suffix}.mp4"><track kind="captions" '
+                  f'src="video{suffix}.vtt" srclang="{lang}" label="{name}" default></video>', ""]
+    for n, step in enumerate(a.steps, 1):
+        text = tr.steps[step.id].text if tr and step.id in tr.steps else step.text
+        lines += [f"{n}. {text}", "", f"   ![Step {n}](images/{n}.png)", ""]
+    lines.append(outro)
+    return "\n".join(lines) + "\n"
+
+
+def docs_zip(a: Article) -> bytes:
+    """Everything a docs site needs: article.md (video embedded), images, and the video and captions, per language."""
     d = store.DATA_DIR / a.id
     buf = io.BytesIO()
     with zipfile.ZipFile(buf, "w", zipfile.ZIP_DEFLATED) as z:
-        lines = [f"# {a.title}", "", a.intro, ""]
         for n, s in enumerate(a.steps, 1):
             z.write(d / image_name(s), f"images/{n}.png")
-            lines += [f"{n}. {s.text}", "", f"   ![Step {n}](images/{n}.png)", ""]
-        lines.append(a.outro)
-        z.writestr("article.md", "\n".join(lines) + "\n")
+        for lang in [a.lang, *a.translations]:
+            suffix = "" if lang == a.lang else f".{lang}"
+            z.writestr(f"article{suffix}.md", _article_md(a, lang, suffix))
+            if _has_video(a, lang):
+                z.write(d / f"video.{lang}.mp4", f"video{suffix}.mp4", compress_type=zipfile.ZIP_STORED)
+                z.write(d / f"captions.{lang}.vtt", f"video{suffix}.vtt")
     return buf.getvalue()
+
+
+def srt(a: Article, lang: str) -> str:
+    cs = [Cue(**c) for c in json.loads((store.DATA_DIR / a.id / f"cues.{lang}.json").read_text())]
+    return to_srt(cs)

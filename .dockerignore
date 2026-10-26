@@ -1,0 +1,15 @@
+**/node_modules
+**/.venv
+**/__pycache__
+**/.ruff_cache
+**/.pytest_cache
+server/data
+web/dist
+e2e
+extension
+docs
+.git
+.superpowers
+.claude
+.agents
+.tokensave
