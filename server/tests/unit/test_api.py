@@ -268,7 +268,7 @@ def test_data_folder_can_be_set(tmp_path):
     import subprocess
     import sys
     out = subprocess.run([sys.executable, "-c", "from app import store; print(store.DATA_DIR)"], capture_output=True,
-                         text=True, env={"STEPCAST_DATA": str(tmp_path), "PATH": ""}, check=True).stdout.strip()
+                         text=True, env={"WALKIE_DATA": str(tmp_path), "PATH": ""}, check=True).stdout.strip()
     assert out == str(tmp_path)
 
 
@@ -280,7 +280,7 @@ def test_server_serves_the_built_web_app(tmp_path):
     code = ("from fastapi.testclient import TestClient; from app import api; c = TestClient(api.app); "
             "print(c.get('/').text); print(c.get('/languages').json()['es'])")
     out = subprocess.run([sys.executable, "-c", code], capture_output=True, text=True, check=True,
-                         env={"STEPCAST_WEB_DIST": str(tmp_path / "web"), "STEPCAST_DATA": str(tmp_path / "data"),
+                         env={"WALKIE_WEB_DIST": str(tmp_path / "web"), "WALKIE_DATA": str(tmp_path / "data"),
                               "PATH": ""}).stdout.split("\n")
     assert out[0] == '<div id="root"></div>' and out[1] == "Spanish"  # app at /, API routes still win
 

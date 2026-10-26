@@ -34,7 +34,7 @@ function Recorder({ label, script, min, onDone }: {
     try {
       stream = await navigator.mediaDevices.getUserMedia({ audio: true });
     } catch {
-      return setError("Stepcast can't use your microphone. Allow it in the browser's address bar, then try again.");
+      return setError("Walkie can't use your microphone. Allow it in the browser's address bar, then try again.");
     }
     const chunks: Blob[] = [];
     const r = new MediaRecorder(stream);

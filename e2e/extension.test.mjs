@@ -1,6 +1,6 @@
 // Real-extension end-to-end test: loads extension/ into Chromium, records the demo app through tabCapture +
 // the offscreen MediaRecorder (with narration), stops, and checks upload → article → editor tab.
-// Needs Stepcast running (STEPCAST_URL, default http://localhost:8000; STEPCAST_DATA if its data folder isn't
+// Needs Walkie running (WALKIE_URL, default http://localhost:8000; WALKIE_DATA if its data folder isn't
 // server/data). Run: npm install && npm test
 import { execFileSync } from "node:child_process";
 import crypto from "node:crypto";
@@ -13,8 +13,8 @@ import { chromium } from "playwright";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const EXT = path.join(ROOT, "extension");
-const API = (process.env.STEPCAST_URL ?? "http://localhost:8000").replace(/\/+$/, "");
-const DATA = process.env.STEPCAST_DATA ?? path.join(ROOT, "server/data");
+const API = (process.env.WALKIE_URL ?? "http://localhost:8000").replace(/\/+$/, "");
+const DATA = process.env.WALKIE_DATA ?? path.join(ROOT, "server/data");
 const SITE_PORT = 8090;
 const check = (ok, msg) => {
   if (!ok) throw new Error(`FAIL: ${msg}`);
@@ -37,7 +37,7 @@ const site = http.createServer((req, res) => {
 const id = [...crypto.createHash("sha256").update(EXT).digest("hex").slice(0, 32)]
   .map((c) => String.fromCharCode(97 + parseInt(c, 16))).join("");
 
-const ctx = await chromium.launchPersistentContext(mkdtempSync(path.join(os.tmpdir(), "stepcast-e2e-")), {
+const ctx = await chromium.launchPersistentContext(mkdtempSync(path.join(os.tmpdir(), "walkie-e2e-")), {
   channel: "chromium",
   headless: true,
   viewport: null, // the real window size, as users have it

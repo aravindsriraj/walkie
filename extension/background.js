@@ -1,5 +1,5 @@
 const DEFAULT_SERVER = "http://localhost:8000";
-// Where Stepcast runs (Options page). The same address serves the API and the editor.
+// Where Walkie runs (Options page). The same address serves the API and the editor.
 const server = async () => ((await chrome.storage.sync.get("server")).server || DEFAULT_SERVER).replace(/\/+$/, "");
 
 // In-memory recording state, mirrored to storage.session in case the worker is restarted.

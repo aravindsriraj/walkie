@@ -1,5 +1,5 @@
 services:
-  stepcast:
+  walkie:
     build: .
     ports:
       - "8000:8000"

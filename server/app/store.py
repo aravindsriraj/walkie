@@ -6,8 +6,8 @@ from pathlib import Path
 
 from app.models import Article
 
-DATA_DIR = Path(os.getenv("STEPCAST_DATA", Path(__file__).resolve().parent.parent / "data"))
-_db: Path = DATA_DIR / "stepcast.db"
+DATA_DIR = Path(os.getenv("WALKIE_DATA", Path(__file__).resolve().parent.parent / "data"))
+_db: Path = DATA_DIR / "walkie.db"
 
 
 def _conn() -> sqlite3.Connection:
@@ -18,6 +18,8 @@ def init(db: Path | None = None) -> None:
     global _db
     if db:
         _db = db
+    elif not _db.exists() and _db.with_name("stepcast.db").exists():  # the product was called Stepcast
+        _db.with_name("stepcast.db").rename(_db)
     _db.parent.mkdir(parents=True, exist_ok=True)
     with _conn() as c:
         c.execute("CREATE TABLE IF NOT EXISTS articles (id TEXT PRIMARY KEY, data TEXT, created_at TEXT)")
@@ -65,6 +67,6 @@ def mark_interrupted() -> None:
         if a.status == "processing":
             a = a.model_copy(update={"status": "failed", "error": "Interrupted — please re-upload"})
         videos = {lang: v.model_copy(update={"status": "failed", "stage": "", "updating": [],
-                                             "error": "Stepcast was restarted while making this video. Try again."})
+                                             "error": "Walkie was restarted while making this video. Try again."})
                   if v.status == "rendering" else v for lang, v in a.videos.items()}
         save(a.model_copy(update={"videos": videos}))

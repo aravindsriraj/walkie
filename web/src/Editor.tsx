@@ -99,7 +99,7 @@ export function Editor({ id }: { id: string }) {
     return () => clearInterval(t);
   }, [polling, id, merge]);
 
-  useEffect(() => { document.title = a?.title ? `${a.title} – Stepcast` : "Stepcast"; }, [a?.title]);
+  useEffect(() => { document.title = a?.title ? `${a.title} – Walkie` : "Walkie"; }, [a?.title]);
 
   const scheduleRender = useCallback((lang: string) => {
     clearTimeout(renderTimers.current[lang]);
@@ -252,7 +252,7 @@ export function Editor({ id }: { id: string }) {
     return (
       <>
         <TopBar title="" />
-        <div className="notice"><h1>Can't open this article</h1><p>{error}. Check that the Stepcast server is running.</p></div>
+        <div className="notice"><h1>Can't open this article</h1><p>{error}. Check that the Walkie server is running.</p></div>
       </>
     );
   }
@@ -272,7 +272,7 @@ export function Editor({ id }: { id: string }) {
           <p className="error-text">{a.error}</p>
           <p>{a.source === "upload"
             ? "Upload a screen recording where you click or type at least once."
-            : "Record the flow again from the Stepcast extension. Click or type at least once while recording."}</p>
+            : "Record the flow again from the Walkie extension. Click or type at least once while recording."}</p>
           <div className="notice-actions">
             <a className="button" href="#/">Back to articles</a>
             <button className="button quiet-danger" onClick={() => setConfirming(true)}>Delete</button>
@@ -374,7 +374,7 @@ export function Editor({ id }: { id: string }) {
           <main className="doc">
             {a.source === "upload" && !noteHidden && view === "article" && (
               <p className="ai-note" role="note">
-                Stepcast found these steps, and what to blur, in your uploaded video. Check each screenshot before you share.
+                Walkie found these steps, and what to blur, in your uploaded video. Check each screenshot before you share.
                 <button className="link" onClick={() => setNoteHidden(true)}>Got it</button>
               </p>
             )}

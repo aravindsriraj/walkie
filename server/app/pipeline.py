@@ -52,7 +52,7 @@ async def process(article_id: str) -> None:
         try:
             await asyncio.to_thread(media.transcode, source, mp4)
         except subprocess.CalledProcessError as e:
-            raise ValueError("This file isn't a video Stepcast can read. Try an MP4, MOV or WebM file.") from e
+            raise ValueError("This file isn't a video Walkie can read. Try an MP4, MOV or WebM file.") from e
 
         if not log_file.exists():
             if (await asyncio.to_thread(media.probe, mp4))[2] > MAX_UPLOAD_MS:

@@ -117,7 +117,7 @@ export const saveGlossary = (words: string[]) =>
 export async function deleteArticle(id: string): Promise<void> {
   const res = await fetch(`${API}/articles/${id}`, { method: "DELETE" });
   // 405: a server started before delete existed. Say so, rather than "Method Not Allowed".
-  if (res.status === 405) throw new Error("The Stepcast server is out of date. Restart it, then try again.");
+  if (res.status === 405) throw new Error("The Walkie server is out of date. Restart it, then try again.");
   if (!res.ok) throw await failure(res);
 }
 
@@ -133,7 +133,7 @@ export function uploadVideo(file: File, onProgress: (fraction: number) => void):
       if (xhr.status < 300 && body.id) resolve({ id: body.id });
       else reject(new Error(body.detail ?? `Upload failed (${xhr.status})`));
     };
-    xhr.onerror = () => reject(new Error("Couldn't reach the Stepcast server. Check that it's running."));
+    xhr.onerror = () => reject(new Error("Couldn't reach the Walkie server. Check that it's running."));
     const form = new FormData();
     form.append("video", file);
     xhr.send(form);

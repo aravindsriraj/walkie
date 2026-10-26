@@ -118,11 +118,11 @@ def _font(path: str, size: int) -> ImageFont.FreeTypeFont:
 
 
 def caption_font(text: str, size: int) -> ImageFont.FreeTypeFont:
-    paths = [p for p in [os.getenv("STEPCAST_CAPTION_FONT", ""), *FONTS] if p and Path(p).exists()]
+    paths = [p for p in [os.getenv("WALKIE_CAPTION_FONT", ""), *FONTS] if p and Path(p).exists()]
     for path in paths:
         if covers(f := _font(path, size), text):
             return f
-    raise ValueError("No installed font can draw these captions. Set STEPCAST_CAPTION_FONT to a font that covers "
+    raise ValueError("No installed font can draw these captions. Set WALKIE_CAPTION_FONT to a font that covers "
                      "this language, or download the captions file instead.")
 
 

@@ -5,7 +5,7 @@ export function TopBar({ title, children }: { title?: string; children?: ReactNo
     <header className="topbar">
       <a href="#/" className="wordmark">
         <span className="mark" aria-hidden="true" />
-        <span className="wordmark-text">Stepcast</span>
+        <span className="wordmark-text">Walkie</span>
       </a>
       {title !== undefined && (
         <>

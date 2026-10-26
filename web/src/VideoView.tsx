@@ -56,7 +56,7 @@ export function VideoView({ a, lang, onNarration, onStep, onVoice, onMerge, onDe
       <div className="video-empty">
         <h2>Turn this article into a narrated video</h2>
         <p>
-          Stepcast writes a script from your steps and what you said, records a natural voiceover, and zooms in on
+          Walkie writes a script from your steps and what you said, records a natural voiceover, and zooms in on
           every click. Edit the script here and the video follows.
         </p>
         <button className="button primary" onClick={onMake}>Make video</button>

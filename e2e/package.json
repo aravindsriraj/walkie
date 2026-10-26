@@ -1,5 +1,5 @@
 {
-  "name": "stepcast-e2e",
+  "name": "walkie-e2e",
   "private": true,
   "type": "module",
   "scripts": { "test": "node extension.test.mjs" },

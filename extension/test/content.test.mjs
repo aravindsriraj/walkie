@@ -42,8 +42,8 @@ test("targetOf climbs from inner span to the button", () => {
   assert.equal(targetOf(doc.getElementById("s")).id, "b");
 });
 
-test("redactRects finds email inputs and data-stepcast-redact, not plain fields", () => {
-  const doc = page('<input type="email"><input id="plain" value="hello"><div data-stepcast-redact>secret</div><input value="x@y.io">');
+test("redactRects finds email inputs and data-walkie-redact, not plain fields", () => {
+  const doc = page('<input type="email"><input id="plain" value="hello"><div data-walkie-redact>secret</div><input value="x@y.io">');
   assert.equal(redactRects(doc).length, 3);
   assert.equal(isSensitive(doc.getElementById("plain")), false);
 });

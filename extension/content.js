@@ -1,4 +1,4 @@
-// Records what the user clicks/types (labels + positions) while a Stepcast recording is running.
+// Records what the user clicks/types (labels + positions) while a Walkie recording is running.
 // Sensitive values never leave the page: they're blanked here and their boxes are sent for blurring.
 (() => {
   const INTERACTIVE =
@@ -21,7 +21,7 @@
     return (
       (el.tagName === "INPUT" && SENSITIVE_TYPES.has((el.type || "").toLowerCase())) ||
       /cc-|password|one-time-code/.test(ac) ||
-      !!el.closest("[data-stepcast-redact]") ||
+      !!el.closest("[data-walkie-redact]") ||
       (isField(el) && EMAIL.test(el.value || ""))
     );
   }
@@ -56,7 +56,7 @@
 
   function redactRects(doc) {
     const win = doc.defaultView;
-    const fields = [...doc.querySelectorAll("input,textarea,[data-stepcast-redact]")].filter(isSensitive);
+    const fields = [...doc.querySelectorAll("input,textarea,[data-walkie-redact]")].filter(isSensitive);
     return [...fields, ...emailTextElements(doc)]
       .map((el) => el.getBoundingClientRect())
       .filter((r) => r.width > 0 && r.height > 0 && r.bottom > 0 && r.right > 0 && r.top < win.innerHeight && r.left < win.innerWidth)

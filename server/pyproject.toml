@@ -1,7 +1,7 @@
 [project]
-name = "stepcast-server"
+name = "walkie-server"
 version = "0.1.0"
-description = "Stepcast API: recordings in, help articles out."
+description = "Walkie API: recordings in, help articles out."
 requires-python = ">=3.11,<3.14"
 dependencies = [
     "google-genai>=2.33.0,<3",

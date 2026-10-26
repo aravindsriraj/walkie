@@ -51,7 +51,7 @@ export function ShareMenu({ a, lang, flush }: { a: Article; lang: string; flush:
           }}
         >
           {copied ? "Link copied" : "Copy link"}
-          <span className="menu-hint">{copied ? "Paste it anywhere" : "Anyone who can reach this Stepcast can open it"}</span>
+          <span className="menu-hint">{copied ? "Paste it anywhere" : "Anyone who can reach this Walkie can open it"}</span>
         </button>
         <button className="menu-item" onClick={() => download(downloadUrl(a.id, "html"))}>
           Download HTML

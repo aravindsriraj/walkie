@@ -50,7 +50,7 @@ function stop(events) {
       if (!res.ok) throw new Error(`Upload failed (${res.status}): ${await res.text()}`);
       tell({ type: "uploaded", id: (await res.json()).id });
     } catch (e) {
-      tell({ type: "failed", error: `${e.message || e}. Is Stepcast running at ${api}? Check the address in the extension's Options.` });
+      tell({ type: "failed", error: `${e.message || e}. Is Walkie running at ${api}? Check the address in the extension's Options.` });
     }
   };
   recorder.stop();

@@ -1,5 +1,5 @@
 {
-  "name": "stepcast-extension",
+  "name": "walkie-extension",
   "private": true,
   "scripts": { "test": "node --test test/*.test.mjs" },
   "devDependencies": { "jsdom": "26.1.0" }

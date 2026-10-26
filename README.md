@@ -1,6 +1,6 @@
 <div align="center">
 
-# Stepcast
+# Walkie
 
 **Walk through a feature once. Get a narrated tutorial video and a step-by-step help article,<br>
 in 20 languages, ready for your docs site.**
@@ -12,9 +12,9 @@ in 20 languages, ready for your docs site.**
 [Quick start](#quick-start) · [How it works](#how-it-works) · [Tour](#tour) ·
 [Docs sites](#publish-to-your-docs-site) · [FAQ](#faq) · [Developing](#developing)
 
-<img src="docs/media/demo.gif" alt="A tutorial video made by Stepcast: zoom on each click, outlined fields, a blurred email address and captions" width="800">
+<img src="docs/media/demo.gif" alt="A tutorial video made by Walkie: zoom on each click, outlined fields, a blurred email address and captions" width="800">
 
-<sub>Made by Stepcast from one recording. The voiceover (captions here, since GIFs are silent), zoom, outlines and
+<sub>Made by Walkie from one recording. The voiceover (captions here, since GIFs are silent), zoom, outlines and
 the blurred email address are all automatic.</sub>
 
 </div>
@@ -22,9 +22,9 @@ the blurred email address are all automatic.</sub>
 ## Why
 
 Recording a product tutorial by hand means retakes, a video editor, and doing it all again for every language and
-every UI change. Stepcast turns one rough walkthrough, "umm"s and mistakes included, into:
+every UI change. Walkie turns one rough walkthrough, "umm"s and mistakes included, into:
 
-| You do | Stepcast does |
+| You do | Walkie does |
 |---|---|
 | Click through the feature in Chrome, talking if you like | Writes the steps and a tight spoken script |
 | | Records a natural voiceover (five reviewed voices, or **your own voice**) |
@@ -48,7 +48,7 @@ You need [Docker](https://www.docker.com/products/docker-desktop/), Google Chrom
    echo "GEMINI_API_KEY=your-key" >> server/.env
    ```
 
-2. **Start Stepcast**
+2. **Start Walkie**
 
    ```bash
    docker compose up -d
@@ -58,7 +58,7 @@ You need [Docker](https://www.docker.com/products/docker-desktop/), Google Chrom
    the `extension/` folder.
 4. **Open <http://localhost:8000>**
 
-Then open the page you want to document, click the Stepcast icon → **Start recording**, walk through the task and
+Then open the page you want to document, click the Walkie icon → **Start recording**, walk through the task and
 click **Stop & create article**. The article opens first; the narrated video follows about a minute later under
 **Video**.
 
@@ -67,13 +67,13 @@ click **Stop & create article**. The article opens first; the narrated video fol
 > 2 GB). Gemini finds the clicks for you. A visible mouse pointer makes the outlines land more precisely.
 
 <details>
-<summary><b>Running Stepcast on a shared machine</b></summary>
+<summary><b>Running Walkie on a shared machine</b></summary>
 
-Start it on any machine your team can reach, then point each person's extension at it: right-click the Stepcast
+Start it on any machine your team can reach, then point each person's extension at it: right-click the Walkie
 icon → **Options** → enter the address (for example `http://docs-box.internal:8000`). To use a port other than
 8000, change `"8000:8000"` in `docker-compose.yml` to, say, `"8080:8000"`.
 
-Stepcast has no accounts, so keep it on a private network. See [Privacy](#privacy).
+Walkie has no accounts, so keep it on a private network. See [Privacy](#privacy).
 
 </details>
 
@@ -91,7 +91,7 @@ flowchart LR
     langs --> zip["Export for docs<br/>Markdown · images · MP4 · VTT"]
 ```
 
-**In sync by design.** Instead of laying a voice over the recording, Stepcast fits each scene's footage to its
+**In sync by design.** Instead of laying a voice over the recording, Walkie fits each scene's footage to its
 sentence. A click always lands just after its sentence starts (0.4 s), slow
 stretches are sped up (never past 3×) or cut, and the screen holds still when the voice needs longer. Translations
 are re-timed the same way, so a longer German sentence never runs into the next click.
@@ -181,7 +181,7 @@ use **Download video with captions** to get them drawn into the picture.
 
 ## Privacy
 
-- **Blurring:** password, email, phone and card fields, anything marked `data-stepcast-redact`, and visible text
+- **Blurring:** password, email, phone and card fields, anything marked `data-walkie-redact`, and visible text
   containing an email are blurred in the screenshots and throughout the video. For uploads, Gemini looks for
   personal data every 2 seconds and after every click; check uploads before you share them.
 - **What Gemini sees:** blurred screenshots, the text of your steps, and your narration audio when transcribing
@@ -190,7 +190,7 @@ use **Download video with captions** to get them drawn into the picture.
   each week and keeps nothing. **Settings → Remove my voice** deletes them.
 
 > [!IMPORTANT]
-> Stepcast has no accounts: anyone who can reach it can see and edit every article. Run it on one machine or a
+> Walkie has no accounts: anyone who can reach it can see and edit every article. Run it on one machine or a
 > private network, never on the open internet.
 
 ## FAQ
@@ -206,7 +206,7 @@ you type. What you type into password fields never leaves the page.
 <details>
 <summary><b>What does it cost?</b></summary>
 
-Stepcast is free. Gemini calls are billed to your own API key at Google's rates.
+Walkie is free. Gemini calls are billed to your own API key at Google's rates.
 
 </details>
 
@@ -222,7 +222,7 @@ in the language you recorded it in.
 <details>
 <summary><b>Do I have to talk while recording?</b></summary>
 
-No. Without narration, Stepcast writes the script from your steps. If you do talk, stumbles and "umm"s are fine:
+No. Without narration, Walkie writes the script from your steps. If you do talk, stumbles and "umm"s are fine:
 the script is rewritten, and the voiceover is recorded fresh.
 
 </details>
@@ -246,9 +246,9 @@ Put `GEMINI_API_KEY=…` in `server/.env`, or export it in the shell you run `do
 </details>
 
 <details>
-<summary><b>The extension can't reach Stepcast</b></summary>
+<summary><b>The extension can't reach Walkie</b></summary>
 
-Check <http://localhost:8000> opens. If Stepcast runs elsewhere or on another port, set the address in the
+Check <http://localhost:8000> opens. If Walkie runs elsewhere or on another port, set the address in the
 extension's **Options**.
 
 </details>
@@ -296,9 +296,9 @@ cd server && uv run python scripts/check_highlights.py data/<article id>   # do 
 <details>
 <summary><b>Settings</b></summary>
 
-- `STEPCAST_DATA`: data folder (default `server/data`)
-- `STEPCAST_API`: where the web dev server forwards API calls
-- `STEPCAST_CAPTION_FONT`: a font file for burned-in captions, if no installed font covers your language
+- `WALKIE_DATA`: data folder (default `server/data`)
+- `WALKIE_API`: where the web dev server forwards API calls
+- `WALKIE_CAPTION_FONT`: a font file for burned-in captions, if no installed font covers your language
 
 </details>
 

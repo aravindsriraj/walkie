@@ -1,4 +1,4 @@
-# Stepcast in one container: the API, the built editor, ffmpeg and caption fonts.
+# Walkie in one container: the API, the built editor, ffmpeg and caption fonts.
 FROM node:22-slim AS web
 WORKDIR /app/web
 COPY web/package.json web/package-lock.json ./
@@ -18,6 +18,6 @@ COPY server/pyproject.toml server/uv.lock ./
 RUN uv sync --frozen --no-dev --no-install-project
 COPY server/app ./app
 COPY --from=web /app/web/dist /app/web/dist
-ENV STEPCAST_DATA=/app/server/data
+ENV WALKIE_DATA=/app/server/data
 EXPOSE 8000
 CMD ["uv", "run", "--no-sync", "uvicorn", "app.api:app", "--host", "0.0.0.0", "--port", "8000"]

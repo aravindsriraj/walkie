@@ -67,7 +67,7 @@ function FirstRun() {
   return (
     <div className="first-run">
       <h1>Make your first article</h1>
-      <p>Show Stepcast a task once, and it turns it into a step-by-step guide with screenshots.</p>
+      <p>Show Walkie a task once, and it turns it into a step-by-step guide with screenshots.</p>
       <NewArticleOptions />
     </div>
   );
@@ -93,11 +93,11 @@ export function Library() {
         setError("");
         if (list.some((a) => a.status === "processing")) timer = window.setTimeout(load, 2000);
       } catch {
-        if (!stop) setError("Can't reach the Stepcast server. Start it from the server folder, then reload this page.");
+        if (!stop) setError("Can't reach the Walkie server. Start it from the server folder, then reload this page.");
       }
     };
     load();
-    document.title = "Articles – Stepcast";
+    document.title = "Articles – Walkie";
     return () => { stop = true; clearTimeout(timer); };
   }, []);
 

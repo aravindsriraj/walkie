@@ -21,8 +21,8 @@ document.getElementById("test").addEventListener("click", async () => {
   try {
     const res = await fetch(`${value()}/languages`);
     if (!res.ok) throw new Error(String(res.status));
-    say(`Connected to Stepcast at ${value()}.`, true);
+    say(`Connected to Walkie at ${value()}.`, true);
   } catch {
-    say(`Can't reach Stepcast at ${value()}. Check that it's running and the address is right.`, false);
+    say(`Can't reach Walkie at ${value()}. Check that it's running and the address is right.`, false);
   }
 });

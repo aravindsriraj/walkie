@@ -32,7 +32,7 @@ async def lifespan(_: FastAPI):
     yield
 
 
-app = FastAPI(title="Stepcast", lifespan=lifespan)
+app = FastAPI(title="Walkie", lifespan=lifespan)
 app.add_middleware(CORSMiddleware, allow_origins=["http://localhost:5173"],
                    allow_origin_regex=r"chrome-extension://.*", allow_methods=["*"], allow_headers=["*"])
 store.DATA_DIR.mkdir(parents=True, exist_ok=True)
@@ -313,6 +313,6 @@ def share(article_id: str, print: bool = False) -> str:
 
 
 # The built web app, served at / (after every API route, so those win). In development Vite serves it instead.
-WEB_DIST = Path(os.getenv("STEPCAST_WEB_DIST", Path(__file__).resolve().parents[2] / "web" / "dist"))
+WEB_DIST = Path(os.getenv("WALKIE_WEB_DIST", Path(__file__).resolve().parents[2] / "web" / "dist"))
 if WEB_DIST.exists():
     app.mount("/", StaticFiles(directory=WEB_DIST, html=True), name="web")

@@ -211,7 +211,7 @@ async def make_voice_key(sample_wav: bytes, consent_wav: bytes) -> str:
     b64 = lambda data: {"mime_type": "audio/wav", "data": base64.b64encode(data).decode()}  # noqa: E731
     async with _aio() as c:
         v = await c.voices.create(store=False, voice={
-            "model": TTS_MODEL, "type": "replicated", "display_name": "Stepcast",
+            "model": TTS_MODEL, "type": "replicated", "display_name": "Walkie",
             "replicated": {"source_audio": b64(sample_wav), "consent_audio": b64(consent_wav)}})
     return v.key
 

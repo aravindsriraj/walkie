@@ -59,10 +59,10 @@ export function NewArticleOptions() {
     <div className="choices">
       <section className="choice">
         <h3>Record in Chrome</h3>
-        <p>Best for your own product. Stepcast logs every click precisely and blurs passwords and emails as you go.</p>
+        <p>Best for your own product. Walkie logs every click precisely and blurs passwords and emails as you go.</p>
         <ol>
           <li>Open the page you want to document.</li>
-          <li>Click the Stepcast icon in the toolbar, then <strong>Start recording</strong>.</li>
+          <li>Click the Walkie icon in the toolbar, then <strong>Start recording</strong>.</li>
           <li>Walk through the task, then <strong>Stop &amp; create article</strong>.</li>
         </ol>
         <p className="choice-note">
@@ -72,7 +72,7 @@ export function NewArticleOptions() {
       </section>
       <section className="choice choice-upload">
         <h3>Upload a video</h3>
-        <p>Already have a screen recording? Stepcast finds the steps and blurs the personal data it can spot.</p>
+        <p>Already have a screen recording? Walkie finds the steps and blurs the personal data it can spot.</p>
         <Upload />
       </section>
     </div>
