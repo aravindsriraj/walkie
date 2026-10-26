@@ -25,7 +25,7 @@ from google import genai
 load_dotenv()
 TTS = "gemini-3.8-flash-tts"
 STYLE = "a calm, friendly product-tour narrator speaking at a natural, unhurried pace"
-VOICES = ["Achird", "Sulafat", "Charon", "Aoede", "Iapetus", "Kore", "Schedar", "Vindemiatrix"]
+VOICES = ["Achird", "Sulafat", "Charon", "Aoede", "Kore"]  # the app's voices; Iapetus failed Spanish (94% wrong)
 LINES = {
     "en": ["Click Glossary in the left navigation to see all your business glossaries.",
            "Expand Atlan Corporate Glossary, then open Business Definitions to see its terms.",
@@ -36,6 +36,12 @@ LINES = {
     "de": ["Klicke links in der Navigation auf Glossary, um alle Geschäftsglossare zu sehen.",
            "Klappe Atlan Corporate Glossary auf und öffne Business Definitions, um die Begriffe zu sehen.",
            "Klicke auf Save, und der Begriff ist jetzt mit dieser Tabelle verknüpft."],
+    "fr": ["Cliquez sur Glossary dans la navigation à gauche pour voir tous vos glossaires métier.",
+           "Développez Atlan Corporate Glossary, puis ouvrez Business Definitions pour voir ses termes.",
+           "Cliquez sur Save : le terme est maintenant lié à cette table."],
+    "ja": ["左側のナビゲーションで Glossary をクリックすると、すべてのビジネス用語集が表示されます。",
+           "Atlan Corporate Glossary を展開し、Business Definitions を開いて用語を確認します。",
+           "Save をクリックすると、用語がこのテーブルにリンクされます。"],
 }
 
 
@@ -58,9 +64,12 @@ async def speak(c, text: str, voice: str) -> bytes:
     return base64.b64decode(r.output_audio.data)
 
 
-def word_error(ref: str, hyp: str) -> float:
+def word_error(ref: str, hyp: str, lang: str = "") -> float:
     def words(t: str) -> list[str]:
-        return re.findall(r"[\w']+", unicodedata.normalize("NFKC", t).lower())
+        t = unicodedata.normalize("NFKC", t).lower()
+        # Japanese has no spaces, so each hiragana or kanji counts as one "word". Katakana and Latin are skipped: the
+        # transcript writes English UI names in katakana ("Glossary" → グロッサリー), which is right, not an error.
+        return re.findall(r"[\u3040-\u309f\u4e00-\u9fff]", t) if lang == "ja" else re.findall(r"[\w']+", t)
     r, h = words(ref), words(hyp)
     d = list(range(len(h) + 1))
     for i, rw in enumerate(r, 1):
@@ -78,7 +87,7 @@ async def check(out: Path) -> None:
         voice, lang, n = f.stem.split(".")
         async with gate:
             heard = " ".join(s.text for s in await transcribe(f.read_bytes(), "audio/wav"))
-        return voice, lang, word_error(LINES[lang][int(n) - 1], heard)
+        return voice, lang, word_error(LINES[lang][int(n) - 1], heard, lang)
 
     by = defaultdict(list)
     for voice, lang, w in await asyncio.gather(*(one(f) for f in sorted(out.glob("*.wav")))):

@@ -2,13 +2,15 @@
 
 import os
 import re
+import unicodedata
 from dataclasses import dataclass
 from functools import cache
 from pathlib import Path
 
 from PIL import Image, ImageDraw, ImageFont, features
 
-LINE = 42  # characters per caption line (broadcast convention)
+LINE = 42  # columns per caption line (broadcast convention); a full-width character takes two
+NO_LINE_START = "、。，．・：；！？）」』】ー"  # noqa: RUF001 (no Japanese or Chinese line begins with these)
 
 
 @dataclass(frozen=True)
@@ -23,13 +25,22 @@ def speakable(text: str) -> str:
     return re.sub(r"\s+", " ", re.sub(r"\*\*|`", "", text)).strip()
 
 
+def _cols(text: str) -> int:
+    """Screen width in columns: Chinese, Japanese and Korean characters are twice as wide as Latin ones."""
+    return sum(2 if unicodedata.east_asian_width(c) in "WF" else 1 for c in text)
+
+
 def _wrap(text: str) -> list[str]:
     lines: list[str] = []
     for word in text.split(" "):
-        if lines and len(lines[-1]) + 1 + len(word) <= LINE:
+        if lines and _cols(lines[-1]) + 1 + _cols(word) <= LINE:
             lines[-1] += " " + word
-        else:
-            lines.append(word)
+            continue
+        lines.append("")
+        for c in word:  # Japanese and Chinese have no spaces, so a long run breaks between full-width characters
+            if lines[-1] and _cols(lines[-1] + c) > LINE and _cols(c) == 2 and c not in NO_LINE_START:
+                lines.append("")
+            lines[-1] += c
     return lines
 
 

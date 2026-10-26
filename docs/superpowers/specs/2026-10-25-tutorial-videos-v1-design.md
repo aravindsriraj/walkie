@@ -303,6 +303,8 @@ The existing article editor gains a **Video** view next to the **Article** view:
 - **Voices, measured:** every sample clip is transcribed back and compared word for word
   (`server/scripts/voice_samples.py`). The five chosen voices score 0–5% word error in English, Spanish and German.
   Iapetus read Spanish as English (94% wrong) and is excluded.
+  French and Japanese, checked last: 0–10% and 3% (Japanese scored on hiragana and kanji, since the transcript
+  writes English UI names in katakana). Both rendered end to end in Docker in 51 s, with captions and burn-in.
 - **Outlines on uploads:** elements are located on the frame at the click, trusting the mouse pointer over the
   guessed label, and the element's real visible name replaces the guess (which also fixes the narration). On the
   Atlan upload: about 22 of 23 correct by eye, up from about 13–17. `server/scripts/check_highlights.py` measures it.

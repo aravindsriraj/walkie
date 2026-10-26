@@ -20,6 +20,15 @@ def test_one_long_word_does_not_break_wrapping():
     assert cs == [Cue(0, 1000, "x" * 60)]
 
 
+def test_japanese_wraps_between_characters_to_fit_the_frame():
+    ja = "リンクされたら、用語バッジをクリックしてクイックプレビューと主要な詳細を確認します。"
+    cs = cues([(0, 4000, "まず Glossary をクリックします。 " + ja)])
+    lines = [line for c in cs for line in c.text.split("\n")]
+    assert all(len(line) <= 21 for line in lines if line.isascii() is False)  # 21 full-width characters = 42 columns
+    assert "".join(lines).replace(" ", "") == ("まずGlossaryをクリックします。" + ja)
+    assert not any(line[0] in "、。" for line in lines)
+
+
 def test_vtt_and_srt_formats():
     cs = [Cue(250, 61500, "Hello\nthere"), Cue(3_600_000, 3_601_000, "Late")]
     assert to_vtt(cs) == ("WEBVTT\n\n00:00:00.250 --> 00:01:01.500\nHello\nthere\n\n"
